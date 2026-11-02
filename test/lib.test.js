@@ -160,3 +160,20 @@ test('milestones count from the oldest upload', () => {
   const ms = C.milestones(videos);
   assert.deepEqual(ms.map(m => [m.key, m.i]), [['n1', 119], ['n100', 20], ['top', 7]]);
 });
+
+test('relBounds reads YouTube’s long and short relative labels', () => {
+  const at = NOW.getTime();
+  const Y = 365.25 * C.DAY;
+  const [lo, hi] = C.relBounds('5 years ago', at);
+  assert.deepEqual(C.relBounds('5y ago', at), [lo, hi]);
+  assert.deepEqual(C.relBounds('5 yrs ago', at), [lo, hi]);
+  assert.ok(lo <= at - 5 * Y && hi >= at - 5 * Y);
+  assert.deepEqual(C.relBounds('2 wk ago', at), C.relBounds('2 weeks ago', at));
+  assert.deepEqual(C.relBounds('11 mo ago', at), C.relBounds('11 months ago', at));
+  assert.deepEqual(C.relBounds('3d ago', at), C.relBounds('3 days ago', at));
+  assert.deepEqual(C.relBounds('4 hr ago', at), C.relBounds('4 hours ago', at));
+  assert.deepEqual(C.relBounds('Streamed 2y ago', at), C.relBounds('Streamed 2 years ago', at));
+  // A bare "m" could be minutes or months, so it gives no bounds rather than wrong ones.
+  assert.deepEqual(C.relBounds('5m ago', at), [-Infinity, Infinity]);
+  assert.deepEqual(C.relBounds('5 ago', at), [-Infinity, Infinity]);
+});

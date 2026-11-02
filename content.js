@@ -334,7 +334,9 @@ input::placeholder { color: var(--fg-3); }
 
 /* Milestones */
 .col { position: relative; }
-.pin { position: absolute; left: 50%; top: 0; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--fg); }
+/* A milestone sits just above its own bar, so it follows the bar's height. */
+.fill { position: relative; }
+.pin { position: absolute; left: 50%; bottom: calc(100% + 3px); width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--fg-2); }
 .cd.ms::after { content: ""; position: absolute; inset: 32%; border-radius: 50%; background: var(--fg); }
 .miles { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin-top: 16px; padding-bottom: 2px; }
 .miles::-webkit-scrollbar { display: none; }
@@ -1359,7 +1361,7 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
       setHTML(el, `
         <div class="tl-head"><h3 class="tl-title">Uploads by year</h3><button class="link-btn" data-act="history" title="Every upload day across the channel's whole history (H)">Whole history</button></div>
         <div class="bars${f.from || f.to || f.otd ? '' : ' all'}" id="bars" data-mode="years">${h.bars.map(b =>
-          `<button class="bar${b.inRange ? ' in' : ''}" data-act="bar" data-k="${b.key}" data-from="${b.from}" data-to="${b.to}" data-n="${b.count}" data-tip-h="${b.key}" data-tip="${esc(tipFor(b))}" aria-label="${esc(b.title)}" aria-pressed="${b.inRange}"><span class="col">${byYear.has(b.key) ? '<span class="pin"></span>' : ''}<span class="fill"></span></span><span class="lbl">${esc(b.label)}</span></button>`).join('')}</div>
+          `<button class="bar${b.inRange ? ' in' : ''}" data-act="bar" data-k="${b.key}" data-from="${b.from}" data-to="${b.to}" data-n="${b.count}" data-tip-h="${b.key}" data-tip="${esc(tipFor(b))}" aria-label="${esc(b.title)}" aria-pressed="${b.inRange}"><span class="col"><span class="fill">${byYear.has(b.key) ? '<span class="pin"></span>' : ''}</span></span><span class="lbl">${esc(b.label)}</span></button>`).join('')}</div>
         <div class="tl-foot" id="tlFoot">${estNote() || '<span class="tl-note">Drag across years to pick several</span>'}</div>
         ${ms.length ? `<div class="miles" id="miles">${ms.map(m =>
           `<button class="mile" data-act="mile" data-i="${m.i}" data-label="${esc(m.label)}"><span class="mk">${esc(m.label)}</span><span class="mv">${m.exact ? esc(C.fmtDate(m.t)) : `About ${new Date(m.t).getFullYear()}`}</span></button>`).join('')}</div>` : ''}`);
@@ -1979,7 +1981,8 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
 
   // ---------- exact dates on hover, anywhere on YouTube ----------
 
-  const HOVER_REL = /^(?:streamed\s+|premiered\s+)?\d+\s+(second|minute|hour|day|week|month|year)s?\s+ago$/i;
+  // Long labels ("3 years ago") and the short ones on YouTube's newer cards ("3y ago", "2 wk ago", "11 mo ago", "5m ago").
+  const HOVER_REL = /^(?:streamed\s+|premiered\s+)?\d+\s*(?:seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|wks?|w|months?|mos?|years?|yrs?|y)\.?\s+ago$/i;
   let hoverEl = null, hoverTimer = 0, hoverSeq = 0;
 
   // The video a date label belongs to: the watch page's own video, or the one card around the label.

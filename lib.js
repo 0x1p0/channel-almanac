@@ -69,7 +69,12 @@ var CDF = (() => {
     return out;
   }
 
-  const REL = /^(?:streamed\s+|premiered\s+|updated\s+)?(\d+)\s+(second|minute|hour|day|week|month|year)s?\s+ago$/i;
+  // YouTube writes these long ("3 years ago") or, on newer cards, short ("3y ago", "2 wk ago", "11 mo ago").
+  // A bare "m" is left out: it could mean minutes or months, and a wrong unit would give bounds
+  // that miss the real date.
+  const REL = /^(?:streamed\s+|premiered\s+|updated\s+)?(\d+)\s*(seconds?|secs?|s|minutes?|mins?|hours?|hrs?|h|days?|d|weeks?|wks?|w|months?|mos?|years?|yrs?|y)\.?\s+ago$/i;
+  const UNIT_WORD = { s: 'second', sec: 'second', second: 'second', min: 'minute', minute: 'minute', h: 'hour', hr: 'hour', hour: 'hour', d: 'day', day: 'day', w: 'week', wk: 'week', week: 'week', mo: 'month', month: 'month', y: 'year', yr: 'year', year: 'year' };
+  const relUnit = word => { const w = word.toLowerCase(); return UNIT[UNIT_WORD[w] || UNIT_WORD[w.replace(/s$/, '')]]; };
   const DUR = /^(?:(\d+):)?(\d{1,2}):(\d{2})$/;
   const VIEWS = /^([\d][\d.,]*)\s*([KMB])?\s+views?$/i;
 
@@ -266,7 +271,7 @@ var CDF = (() => {
     let d = parseDateStr(clean);
     if (!d) {
       const m = REL.exec(clean);
-      if (m) d = { t: now - (+m[1]) * UNIT[m[2].toLowerCase()], dateOnly: true };
+      if (m) d = { t: now - (+m[1]) * relUnit(m[2]), dateOnly: true };
     }
     return { t: d ? d.t : 0, dateOnly: d ? d.dateOnly : false, channelId, author };
   }
@@ -291,7 +296,7 @@ var CDF = (() => {
   function relBounds(rel, at) {
     const m = REL.exec((rel || '').trim());
     if (!m) return [-Infinity, Infinity];
-    const n = +m[1], u = UNIT[m[2].toLowerCase()];
+    const n = +m[1], u = relUnit(m[2]);
     return [at - (n + 1) * u - DAY, at - Math.max(0, n - 1) * u + DAY];
   }
 
