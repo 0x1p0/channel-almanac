@@ -138,12 +138,12 @@ export const problem = {
 };
 
 export const steps = [
-  { shot: 'chip.webp', title: 'Click Dates', text: 'It sits next to Latest, Popular and Oldest on any channel’s Videos, Shorts or Live tab.' },
-  { shot: 'type.webp', title: 'Say when', text: 'Type “march 2019”, “summer 2021” or “first video”. The preview counts the uploads before you press Enter.' },
-  { shot: 'range.webp', title: 'Get every upload from then', text: 'Exact dates and times, sorted, ready to play in order or share as a link.' },
+  { shot: 'chip.webp', title: 'Click Dates', text: 'It sits next to Latest, Popular and Oldest on any channel’s Videos, Shorts or Live tab.', alt: 'YouTube’s Latest, Popular and Oldest chips with the Dates chip added after them.', fit: 'chip' },
+  { shot: 'type-panel.webp', title: 'Say when', text: 'Type “february 2021”, “summer 2019” or “first video”. The preview counts the uploads before you press Enter.', alt: 'The Channel Almanac panel on NASA’s channel with “february 2021” typed and the preview “32 uploads, press Enter”.', fit: 'top' },
+  { shot: 'range-panel.webp', title: 'Get every upload from then', text: 'Exact dates and times, ready to play in order or share as a link.', alt: 'February 2021 on NASA’s channel: 32 uploads listed with exact dates such as Sun, Feb 28, 2021, 2:43 PM.', fit: 'bottom' },
 ];
 
 export const extras = [
-  { shot: 'history.webp', title: 'Whole history', text: 'A channel’s entire career on one screen, a row of days per year.' },
-  { shot: 'hover.webp', title: 'Exact dates on hover', text: 'Point at any “3 years ago” on YouTube for the day and time.' },
+  { shot: 'history-panel.webp', title: 'Whole history', text: 'All 6,197 of NASA’s uploads since 2008, a row of days per year.', alt: 'Whole history of NASA’s channel: one row of days per year from 2008 to 2026, darker where more videos went up.' },
+  { shot: 'hover-tip.webp', title: 'Exact dates on hover', text: 'Point at any “5y ago” on YouTube for the day and time.', alt: 'A tooltip reading Mon, Feb 22, 2021, 2:16 PM above a NASA video labelled 5y ago.' },
 ];

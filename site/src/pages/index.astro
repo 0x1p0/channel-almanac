@@ -12,7 +12,7 @@ const ch = exampleChannel(NOW);
 const target = ch.uploads[ch.target];
 const label = relativeLabel(target.t, NOW);
 const pile = ch.uploads.filter((u) => relativeLabel(u.t, NOW) === label).length;
-const problemShot = await shot('problem.webp');
+const problemShot = await shot('problem-crop.webp');
 const stepShots = await Promise.all(steps.map((s) => shot(s.shot)));
 const extraShots = await Promise.all(extras.map((s) => shot(s.shot)));
 const video = media('channel-almanac-demo.mp4');
@@ -45,7 +45,7 @@ const poster = media('channel-almanac-demo.jpg');
     </dl>
     {problemShot && (
       <figure class="problem__shot">
-        <img src={problemShot.src} width={problemShot.width} height={problemShot.height} loading="lazy" decoding="async" alt="NASA’s Videos tab on YouTube: Latest, Popular and Oldest chips above a grid of uploads labelled only with how many years ago they went up." />
+        <img src={problemShot.src} width={problemShot.width} height={problemShot.height} loading="lazy" decoding="async" alt="NASA’s Videos tab on YouTube: Latest, Popular and Oldest chips above uploads labelled only 11y ago, 12y ago and 5y ago." />
         <figcaption>YouTube today: three sorts and “years ago”.</figcaption>
       </figure>
     )}
@@ -61,10 +61,11 @@ const poster = media('channel-almanac-demo.jpg');
       {steps.map((s, i) => (
         <li class="card" style={`--tilt:${[-1.6, 1.2, -0.8][i]}deg`}>
           <p class="card__n" aria-hidden="true">{i + 1}</p>
-          <div class="card__frame">
+          <div class={`card__frame card__frame--${s.fit}`}>
             {stepShots[i] ? (
-              <img src={stepShots[i]!.src} width={stepShots[i]!.width} height={stepShots[i]!.height} loading="lazy" decoding="async" alt={`${s.title}: ${s.text}`} />
+              <img src={stepShots[i]!.src} width={stepShots[i]!.width} height={stepShots[i]!.height} loading="lazy" decoding="async" alt={s.alt} />
             ) : <div class="card__empty" aria-hidden="true"></div>}
+            {s.fit === 'chip' && <p class="card__keys">or press <kbd>Alt</kbd> <kbd>Shift</kbd> <kbd>D</kbd> anywhere on YouTube</p>}
           </div>
           <h3 class="card__title">{s.title}</h3>
           <p class="card__text">{s.text}</p>
@@ -75,7 +76,7 @@ const poster = media('channel-almanac-demo.jpg');
       <div class="extras">
         {extras.map((s, i) => extraShots[i] && (
           <figure class="extra">
-            <img src={extraShots[i]!.src} width={extraShots[i]!.width} height={extraShots[i]!.height} loading="lazy" decoding="async" alt={`${s.title}: ${s.text}`} />
+            <img src={extraShots[i]!.src} width={extraShots[i]!.width} height={extraShots[i]!.height} loading="lazy" decoding="async" alt={s.alt} />
             <figcaption><b>{s.title}.</b> {s.text}</figcaption>
           </figure>
         ))}
@@ -86,7 +87,7 @@ const poster = media('channel-almanac-demo.jpg');
         <video controls playsinline preload="none" poster={poster ?? undefined} width="1920" height="1080">
           <source src={video} type="video/mp4" />
         </video>
-        <figcaption>The demo, 40 seconds. Shown: NASA’s public YouTube channel. Not affiliated with YouTube or NASA.</figcaption>
+        <figcaption>The demo, 42 seconds, no sound.</figcaption>
       </figure>
     )}
     {(problemShot || stepShots.some(Boolean)) && <p class="shots-note">Screenshots: Channel Almanac running on NASA’s public YouTube channel. Not affiliated with YouTube or NASA.</p>}

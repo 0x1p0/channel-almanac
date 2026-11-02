@@ -179,7 +179,7 @@ code.inline { font-family: var(--f-mono); font-size: 0.9em; padding: 0.05em 0.3e
 .problem__points dd { margin-top: 0.35rem; color: var(--c-muted); }
 .problem__shot { margin-top: 3.5rem; }
 .problem__shot img, .card__frame img, .extra img { width: 100%; height: auto; border-radius: var(--radius); }
-.problem__shot img { border: 1.5px solid var(--c-fg); }
+.problem__shot img { border: 1.5px solid var(--c-fg); background: #fff; }
 .problem__shot figcaption, .extra figcaption { margin-top: 0.75rem; font-size: 0.875rem; color: var(--c-muted); }
 .problem__fix { grid-column: 1 / span 9; margin-top: 3.5rem; font-family: var(--f-display); font-size: clamp(1.6rem, 1.1rem + 2vw, 2.75rem); font-variation-settings: 'wdth' 112, 'wght' 650; letter-spacing: -0.025em; line-height: 1.15; }
 
@@ -194,14 +194,22 @@ code.inline { font-family: var(--f-mono); font-size: 0.9em; padding: 0.05em 0.3e
   font-family: var(--f-display); font-size: clamp(3.5rem, 2.4rem + 3vw, 6rem); font-variation-settings: 'wdth' 125, 'wght' 860; letter-spacing: -0.05em; line-height: 1;
   color: var(--ink); -webkit-text-stroke: 0; text-shadow: 3px 3px 0 var(--paper);
 }
-.card__frame { padding: 0.6rem; border-radius: calc(var(--radius) * 2); background: var(--paper); border: 1.5px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); }
-.card__frame img { border-radius: var(--radius); }
+.card__frame { aspect-ratio: 4 / 5; overflow: hidden; padding: 0.6rem; border-radius: calc(var(--radius) * 2); background: #fff; border: 1.5px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); }
+.card__frame img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius); }
+.card__frame--top img { object-position: top; }
+.card__frame--bottom img { object-position: bottom; }
+/* Step 1: the real chip strip, set large, with the shortcut under it. */
+.card__frame--chip { display: grid; align-content: center; gap: 2rem; padding: 1.25rem; }
+.card__frame--chip img { height: auto; object-fit: contain; }
+.card__keys { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.875rem; color: #5c5c5c; text-align: center; }
+.card__keys kbd { color: var(--ink); }
 .card__empty { aspect-ratio: 16 / 10; border-radius: var(--radius); background: repeating-linear-gradient(135deg, rgb(31 21 0 / 0.06) 0 10px, transparent 10px 20px); }
 .card__title { margin-top: 1.4rem; font-family: var(--f-display); font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem); font-variation-settings: 'wdth' 118, 'wght' 760; letter-spacing: -0.025em; line-height: 1.05; }
 .card__text { margin-top: 0.4rem; max-width: 26em; }
 .extras { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); row-gap: 2rem; margin-top: 4.5rem; }
-.extra { grid-column: span 6; }
-.extra img { border: 1.5px solid var(--ink); background: var(--paper); }
+.extra { grid-column: span 5; }
+.extra:first-child { grid-column: span 7; }
+.extra img { border: 1.5px solid var(--ink); background: #fff; padding: 0.6rem; border-radius: calc(var(--radius) * 2); box-shadow: 6px 6px 0 var(--ink); }
 .extra figcaption { color: var(--c-fg); }
 .video { margin-top: 4.5rem; }
 .video video { display: block; width: 100%; height: auto; border-radius: calc(var(--radius) * 2); background: var(--ink); border: 1.5px solid var(--ink); box-shadow: 8px 8px 0 var(--ink); }
@@ -346,6 +354,7 @@ code.inline { font-family: var(--f-mono); font-size: 0.9em; padding: 0.05em 0.3e
   .problem__title, .problem__text, .problem__fix { grid-column: 1 / -1; }
   .problem__points { grid-template-columns: 1fr; }
   .cards { grid-template-columns: 1fr; row-gap: 3.5rem; }
+  .card__frame--chip { aspect-ratio: auto; padding: 2.5rem 1.25rem; }
   .extra { grid-column: 1 / -1; }
   .demo__head { grid-column: 1 / -1; }
   .demo__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
