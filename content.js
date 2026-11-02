@@ -723,7 +723,17 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
     dirty.clear();
   }
 
-  async function saveEntry(entry) {
+  // Saves run one after another: each one reads, changes and writes the shared channel index,
+  // so two at once would lose one channel's line.
+  let saveChain = Promise.resolve();
+  const discarded = new WeakSet(); // entries dropped by "Clear all saved data"
+  function saveEntry(entry) {
+    saveChain = saveChain.then(() => writeEntry(entry), () => writeEntry(entry));
+    return saveChain;
+  }
+
+  async function writeEntry(entry) {
+    if (discarded.has(entry)) return;
     const videos = entry.videos.map(r => (r[6] === -1 ? r.slice(0, 6).concat(0, r[7]) : r));
     const idx = (await storageGet('idx')) || {};
     idx[entry.channel.id] = { title: entry.channel.title, count: videos.length, syncedAt: entry.syncedAt };
@@ -1260,7 +1270,7 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
         html += `<div class="grp"><span>${esc(monthYearFmt.format(d))}</span><span class="n">${plural(sizes.get(k), 'upload')}</span></div>`;
         last = k;
       }
-      html += rowHTML(i).replace('<a class="row"', `<a class="row" data-g="${k}"`);
+      html += rowHTML(i).replace('<a class="row', `<a data-g="${k}" class="row`); // also matches "row hl" / "row seen"
     }
     return html;
   }
@@ -1528,6 +1538,7 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
     const total = C.findCount(res);
     const owner = C.findOwner(res);
     const seen = new Set();
+    const again = new Map(); // uploads we already have that were listed again, with their current labels
     const tokens = new Set();
     for (let page = 0; page < 2000; page++) {
       const items = C.extractVideos(res);
@@ -1536,7 +1547,7 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
       }
       let reachedKnown = false, added = 0;
       for (const it of items) {
-        if (known.has(it.id)) { reachedKnown = true; continue; }
+        if (known.has(it.id)) { reachedKnown = true; again.set(it.id, it); continue; }
         if (seen.has(it.id)) continue;
         seen.add(it.id);
         out.push([it.id, it.title, it.dur, it.views, it.rel, at, 0, it.flag]);
@@ -1550,7 +1561,7 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
       tokens.add(token);
       res = await YT.call('browse', { continuation: token });
     }
-    return { fresh: out, owner };
+    return { fresh: out, owner, again, at };
   }
 
   // IDs from one of YouTube's per-type upload lists (UUSH Shorts, UULV live), newest first.
@@ -1758,10 +1769,13 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
     setFilters({ from: r.from, to: r.to, otd: false }, { keepAround: true, scroll: true });
   }
 
+  let clearEpoch = 0; // bumped by "Clear all saved data"
+
   async function startSync(full) {
     const ch = S.channel;
     if (!ch || S.syncing.has(ch.id)) return;
     S.syncing.add(ch.id);
+    const epoch = clearEpoch;
     S.banner = null;
     const old = S.entry ? S.entry.videos : [];
     const wasTyped = !!(S.entry && S.entry.typed);
@@ -1778,7 +1792,7 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
 
     try {
       const knownIds = new Set(old.map(r => r[0]));
-      const { fresh, owner } = await listUploads(ch, full ? new Set() : knownIds, (done, total) => {
+      const { fresh, owner, again, at } = await listUploads(ch, full ? new Set() : knownIds, (done, total) => {
         if (!isCurrent()) return;
         if (S.view === 'loading') { S.progress = { done, total }; renderProgress(); }
         else if (full) { S.status = `re-downloading… ${C.fmtCount(done)}`; updateMeta(); }
@@ -1796,8 +1810,24 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
           return r;
         });
       } else {
+        // Saved uploads listed again on the pages just read: refresh what changes over time.
+        // Without this, a premiere or stream seen once would stay "Upcoming" or "LIVE" for good.
+        for (const r of old) {
+          const it = again.get(r[0]);
+          if (!it) continue;
+          const wasPending = /[LU]/.test(r[7] || '');
+          r[1] = it.title;
+          if (it.dur) r[2] = it.dur;
+          if (it.views >= 0) r[3] = it.views;
+          if (it.rel) { r[4] = it.rel; r[5] = at; }
+          setFlag(r, 'L', it.flag === 'L');
+          setFlag(r, 'U', it.flag === 'U');
+          // It has gone out since: look its date up again, since schedules move.
+          if (wasPending && !/[LU]/.test(r[7] || '')) r[6] = 0;
+        }
         videos = fresh.concat(old);
       }
+      if (epoch !== clearEpoch) { S.syncing.delete(ch.id); return; } // saved data was cleared meanwhile
       const entry = { channel: ch, syncedAt: Date.now(), typed: full ? false : wasTyped, videos };
       await saveEntry(entry);
       S.syncing.delete(ch.id);
@@ -2284,8 +2314,11 @@ button:focus-visible { outline: 2px solid #3ea6ff; outline-offset: 2px; }`;
   setInterval(() => { if (S.open && S.view === 'main' && !S.status) updateMeta(); }, 30000);
 
   try {
-    chrome.runtime.onMessage.addListener(msg => {
+    // Always answer: an unanswered message rejects in the background worker, which would then
+    // inject the scripts again and send a second toggle that closes the panel it just opened.
+    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       if (msg && msg.type === 'toggle') { if (S.open) closeDrawer(); else openDrawer(); }
+      sendResponse({ ok: true });
     });
   } catch (e) { /* extension context gone */ }
 
@@ -2720,6 +2753,9 @@ button:focus-visible { outline: 2px solid #3ea6ff; outline-offset: 2px; }`;
   }
 
   async function clearAll() {
+    // Lookups and syncs still running for this channel must not write it back afterwards.
+    if (S.entry) discarded.add(S.entry);
+    clearEpoch++;
     try {
       const all = await chrome.storage.local.get(null);
       const keys = Object.keys(all).filter(k => /^(up|ch|d|v):/.test(k));
