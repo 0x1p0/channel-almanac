@@ -1,0 +1,14 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Packaged builds and signing keys
+*.zip
+*.crx
+*.xpi
+*.pem
+web-ext-artifacts/
+
+node_modules/

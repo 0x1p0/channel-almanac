@@ -1,17 +1,34 @@
 # Channel Date Finder
 
-A browser extension that lets you find anything a YouTube channel ever uploaded by its exact date, right on YouTube. No API key, account or outside server.
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+A free, open-source browser extension that lets you find anything a YouTube channel ever uploaded by its exact date, right on YouTube. No API key, no account, no outside server.
+
+Works in Chrome, Edge, Brave, Arc and other Chromium browsers (121 or newer), and in Firefox (121 or newer).
 
 ## Install
 
-**Chrome, Edge, Brave, Arc**
-1. Unzip `channel-date-finder.zip` somewhere permanent.
-2. Open `chrome://extensions` and turn on **Developer mode**.
-3. Click **Load unpacked** and pick the `channel-date-finder` folder. Reload any open YouTube tabs.
+The extension isn't in the browser stores yet, so install it from this repository.
 
-**Firefox** (121 or newer)
-1. Open `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on** → pick `channel-date-finder-firefox.zip`. (Temporary add-ons are removed when Firefox restarts; publishing it on Firefox Add-ons makes it permanent.)
-2. Firefox asks for site access per site: click the extensions button in the toolbar and allow it on www.youtube.com.
+**Get the code:** clone the repo, or click **Code → Download ZIP** on GitHub and unzip it somewhere permanent.
+
+```bash
+git clone https://github.com/0x1p0/channel-date-finder.git
+```
+
+**Chrome, Edge, Brave, Arc**
+1. Open `chrome://extensions` (or `edge://extensions`) and turn on **Developer mode**.
+2. Click **Load unpacked** and pick the `channel-date-finder` folder.
+3. Reload any YouTube tabs that were already open.
+
+**Firefox**
+1. Open `about:debugging#/runtime/this-firefox` and click **Load Temporary Add-on…**.
+2. Pick the `manifest.json` file inside the `channel-date-finder` folder.
+3. Firefox asks for site access per site: click the extensions button in the toolbar and allow it on www.youtube.com.
+
+Temporary add-ons are removed when Firefox restarts.
+
+**Updating:** pull the latest code (or download the ZIP again), then click the reload icon on the extension's card in `chrome://extensions`, or **Reload** in `about:debugging`.
 
 ## Open it
 
@@ -62,20 +79,66 @@ A browser extension that lets you find anything a YouTube channel ever uploaded 
 
 1. It reads the channel's uploads list from YouTube's own page data, 100 videos per request.
 2. That list only says "3 years ago", so exact upload times are looked up per video. Uploads are in date order, so only the videos at the edges of your range need checking: about 20 lookups decide every video in or out, even on big channels.
-3. Rows on screen and the year open in the calendar come next. Filling in every other upload is off by default; turn it on in Settings (or "Make them exact" under the upload count) to make the year, month and calendar counts exact.
+3. Rows on screen and the year open in the calendar come next. Filling in every other upload is off by default; turn it on in Settings (or "Load all exact dates" under the timeline) to make the year, month and calendar counts exact.
+
+## Privacy
+
+- No analytics, no tracking, no accounts, and no servers of its own. The only site it talks to is youtube.com.
+- Every request goes to youtube.com signed out (no cookies, no visitor id), so nothing is tied to your Google account.
+- Everything it saves (upload lists, exact dates, opened marks, settings) stays in your browser's extension storage. **Settings → Clear all saved data** removes it.
+
+### Permissions
+
+| Permission | Why |
+| --- | --- |
+| `https://www.youtube.com/*` | Show the panel on YouTube and read channel data from YouTube's own endpoints |
+| `storage`, `unlimitedStorage` | Save upload lists and exact dates so channels you've opened before load instantly (big channels can exceed the default quota) |
+| `activeTab`, `scripting` | Let the toolbar button and shortcut work in YouTube tabs opened before the extension was installed |
 
 ## Being gentle with YouTube
 
-- Every request goes to youtube.com signed out (no cookies, no visitor id), so nothing is tied to your Google account.
 - At most 3 lookups at once with gaps between them; calendar and background lookups go one at a time, under two a second.
 - Typical use: opening a 1,000-video channel is about 10–15 list requests, a date range about 15–30 lookups. Reopening a saved channel is 1–3 requests.
 - If YouTube asks it to slow down, it pauses for a minute and resumes on its own.
 
-Everything is saved in the browser, so channels you've opened before load instantly and only new uploads are fetched. Milestones add a handful of lookups per channel.
+Channels you've opened before load instantly and only new uploads are fetched. Milestones add a handful of lookups per channel.
 
-## Files
+## Development
 
-- `manifest.json` — Manifest V3 config
-- `content.js` — the panel, Dates chip, hover dates, play queue and everything that talks to YouTube (Shadow DOM, follows YouTube's light/dark theme)
-- `lib.js` — parsing YouTube's page data, date-range logic, timeline, calendar, stats and standouts
-- `background.js` — toolbar button and shortcut
+There's no build step: the files in this folder are the extension.
+
+| File | What's in it |
+| --- | --- |
+| `manifest.json` | Manifest V3 config (one manifest for Chromium and Firefox) |
+| `content.js` | The panel, Dates chip, hover dates, play queue and everything that talks to YouTube (Shadow DOM, follows YouTube's light/dark theme) |
+| `lib.js` | Pure helpers: parsing YouTube's page data, date-range logic, typed dates, timeline, calendar, stats and standouts |
+| `background.js` | Toolbar button and shortcut |
+| `test/` | Unit tests for `lib.js` |
+
+Run the tests with Node 18 or newer (no dependencies to install):
+
+```bash
+node --test
+```
+
+After editing, reload the extension (see **Updating** above) and refresh the YouTube tab.
+
+To build a ZIP for the Chrome Web Store or Firefox Add-ons:
+
+```bash
+zip -r channel-date-finder.zip manifest.json background.js content.js lib.js icons LICENSE
+```
+
+## Contributing
+
+Bug reports and pull requests are welcome. YouTube changes its page data from time to time, so if something stops working, please open an issue with the channel URL, your browser and what you expected to see.
+
+For pull requests, keep the extension dependency-free, add a test in `test/` for changes to `lib.js`, and run `node --test` before sending.
+
+## Disclaimer
+
+Channel Date Finder is an independent project. It isn't affiliated with, endorsed by or sponsored by YouTube or Google. YouTube is a trademark of Google LLC.
+
+## License
+
+[MIT](LICENSE)
