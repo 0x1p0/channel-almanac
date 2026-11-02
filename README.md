@@ -10,9 +10,9 @@ Works in Chrome, Edge, Brave, Arc and other Chromium browsers (121 or newer), an
 
 **Website: [channel-almanac.vercel.app](https://channel-almanac.vercel.app)**
 
-[![Watch the 42-second demo: Channel Almanac finding NASA's uploads from February 2021](site/public/media/channel-almanac-demo.jpg)](https://channel-almanac.vercel.app/media/channel-almanac-demo.mp4)
+https://github.com/user-attachments/assets/bf13457a-fc3c-4b18-bd6e-f2e65214a761
 
-▶ [Watch the 42-second demo](https://channel-almanac.vercel.app/media/channel-almanac-demo.mp4) (with sound), recorded on NASA's public YouTube channel.
+The 42-second demo (with sound), recorded on NASA's public YouTube channel.
 
 ## Install
 
