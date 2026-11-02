@@ -1,4 +1,4 @@
-// Channel Date Finder — content script.
+// Channel Almanac — content script.
 // A side panel that lists a channel's uploads by exact date, plus three YouTube-wide helpers:
 // exact dates on hover, a Dates chip on channel tabs, and in-order playback of a date range.
 // Everything is read from YouTube itself (the same data its own pages load); no API key.
@@ -17,7 +17,7 @@
   let tt = null;
   try {
     if (window.trustedTypes && trustedTypes.createPolicy) {
-      tt = trustedTypes.createPolicy('channel-date-finder', { createHTML: s => s });
+      tt = trustedTypes.createPolicy('channel-almanac', { createHTML: s => s });
     }
   } catch (e) { /* not required in the extension's isolated world */ }
   const setHTML = (el, s) => { el.innerHTML = tt ? tt.createHTML(s) : s; };
@@ -745,7 +745,7 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
   // ---------- DOM ----------
 
   const host = document.createElement('div');
-  host.id = 'channel-date-finder';
+  host.id = 'channel-almanac';
   const root = host.attachShadow({ mode: 'open' });
   const style = document.createElement('style');
   style.textContent = CSS + CSS_EXTRA;
@@ -757,7 +757,7 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
       <div class="resizer" id="resizer" role="separator" aria-orientation="vertical" aria-label="Resize panel" tabindex="0" title="Drag to resize · double-click to reset"></div>
       <header class="top">
         <span class="avatar" id="chAvatar" aria-hidden="true"></span>
-        <div class="who"><strong class="name" id="chName">Channel Date Finder</strong><span class="sub" id="chSub"></span></div>
+        <div class="who"><strong class="name" id="chName">Channel Almanac</strong><span class="sub" id="chSub"></span></div>
         <div class="hd-acts">
           <button class="icon" data-act="refresh" id="refreshBtn" title="Check for new uploads" aria-label="Check for new uploads" hidden>${ICON.refresh}</button>
           <button class="icon" data-act="settings" aria-label="Settings" title="Settings">${ICON.tune}</button>
@@ -895,7 +895,7 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
 
   function renderHeader() {
     const ch = S.channel && ['main', 'loading', 'error', 'settings'].includes(S.view) ? S.channel : null;
-    $('#chName').textContent = ch && ch.title ? ch.title : 'Channel Date Finder';
+    $('#chName').textContent = ch && ch.title ? ch.title : 'Channel Almanac';
     const av = $('#chAvatar');
     if (ch) {
       if (!ch.avatar) ch.avatar = pageAvatar();

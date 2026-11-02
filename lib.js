@@ -1,4 +1,4 @@
-// Channel Date Finder — pure helpers shared by the content script (and tests).
+// Channel Almanac — pure helpers shared by the content script (and tests).
 //
 // A video record is an array:
 //   [0 id, 1 title, 2 durationSec, 3 views, 4 relativeText, 5 seenAtMs, 6 exactMs, 7 flags]

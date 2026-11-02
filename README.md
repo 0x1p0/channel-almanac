@@ -1,4 +1,6 @@
-# Channel Date Finder
+<img src="icons/icon128.png" width="96" height="96" alt="">
+
+# Channel Almanac
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -10,20 +12,20 @@ Works in Chrome, Edge, Brave, Arc and other Chromium browsers (121 or newer), an
 
 The extension isn't in the browser stores yet, so install it from this repository.
 
-**Get the code:** clone the repo, or click **Code → Download ZIP** on GitHub and unzip it somewhere permanent.
+**Get the code:** clone the repo, or click **Code → Download ZIP** on GitHub and unzip it somewhere permanent (the unzipped folder is called `channel-almanac-main`).
 
 ```bash
-git clone https://github.com/0x1p0/channel-date-finder.git
+git clone https://github.com/0x1p0/channel-almanac.git
 ```
 
 **Chrome, Edge, Brave, Arc**
 1. Open `chrome://extensions` (or `edge://extensions`) and turn on **Developer mode**.
-2. Click **Load unpacked** and pick the `channel-date-finder` folder.
+2. Click **Load unpacked** and pick the `channel-almanac` folder.
 3. Reload any YouTube tabs that were already open.
 
 **Firefox**
 1. Open `about:debugging#/runtime/this-firefox` and click **Load Temporary Add-on…**.
-2. Pick the `manifest.json` file inside the `channel-date-finder` folder.
+2. Pick the `manifest.json` file inside the `channel-almanac` folder.
 3. Firefox asks for site access per site: click the extensions button in the toolbar and allow it on www.youtube.com.
 
 Temporary add-ons are removed when Firefox restarts.
@@ -113,6 +115,7 @@ There's no build step: the files in this folder are the extension.
 | `content.js` | The panel, Dates chip, hover dates, play queue and everything that talks to YouTube (Shadow DOM, follows YouTube's light/dark theme) |
 | `lib.js` | Pure helpers: parsing YouTube's page data, date-range logic, typed dates, timeline, calendar, stats and standouts |
 | `background.js` | Toolbar button and shortcut |
+| `icons/` | Toolbar and store icons. `icon.svg` is the source for the 48 and 128 px PNGs; `icon-16.svg` and `icon-32.svg` are pixel-aligned versions for the small sizes |
 | `test/` | Unit tests for `lib.js` |
 
 Run the tests with Node 18 or newer (no dependencies to install):
@@ -126,7 +129,7 @@ After editing, reload the extension (see **Updating** above) and refresh the You
 To build a ZIP for the Chrome Web Store or Firefox Add-ons:
 
 ```bash
-zip -r channel-date-finder.zip manifest.json background.js content.js lib.js icons LICENSE
+zip -r channel-almanac.zip manifest.json background.js content.js lib.js icons LICENSE
 ```
 
 ## Contributing
@@ -137,7 +140,7 @@ For pull requests, keep the extension dependency-free, add a test in `test/` for
 
 ## Disclaimer
 
-Channel Date Finder is an independent project. It isn't affiliated with, endorsed by or sponsored by YouTube or Google. YouTube is a trademark of Google LLC.
+Channel Almanac is an independent project. It isn't affiliated with, endorsed by or sponsored by YouTube or Google. YouTube is a trademark of Google LLC.
 
 ## License
 

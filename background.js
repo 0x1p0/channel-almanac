@@ -1,4 +1,4 @@
-// Channel Date Finder — background service worker.
+// Channel Almanac — background service worker.
 // All data is read inside the YouTube tab itself; this worker only wires up
 // the toolbar button and the Alt+Shift+D shortcut.
 
