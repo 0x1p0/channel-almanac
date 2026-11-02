@@ -642,9 +642,15 @@ var CDF = (() => {
     const f = {};
     if (cdf === 'today') { f.otd = true; f.from = ''; f.to = ''; }
     else {
+      // Only real calendar days: "2019-02-30" or "2019-13-01" would break every date shown.
+      const real = s => {
+        const d = s && /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+        return d && mk(+d[1], +d[2] - 1, +d[3]) ? s : '';
+      };
       const m = /^(\d{4}-\d{2}-\d{2})?\.\.(\d{4}-\d{2}-\d{2})?$/.exec(cdf);
-      f.from = m && m[1] ? m[1] : '';
-      f.to = m && m[2] ? m[2] : '';
+      f.from = real(m && m[1]);
+      f.to = real(m && m[2]);
+      if (f.from && f.to && f.from > f.to) [f.from, f.to] = [f.to, f.from];
       f.otd = false;
     }
     const type = p.get('type'), len = p.get('len'), sort = p.get('sort');
@@ -717,7 +723,7 @@ var CDF = (() => {
   function presets(now = new Date()) {
     const y = now.getFullYear();
     const today = isoDay(now);
-    const ago30 = isoDay(new Date(now.getTime() - 29 * DAY));
+    const ago30 = isoDay(addDays(now, -29)); // calendar days, so a DST change can't shift it
     return [
       { id: 'all', label: 'All', from: '', to: '' },
       { id: '30d', label: '30 days', from: ago30, to: today },
