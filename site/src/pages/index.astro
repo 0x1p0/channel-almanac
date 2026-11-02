@@ -88,7 +88,7 @@ const poster = media('channel-almanac-demo.jpg');
         <video controls playsinline preload="none" poster={poster ?? undefined} width="1920" height="1080">
           <source src={video} type="video/mp4" />
         </video>
-        <figcaption>The demo, 42 seconds, no sound.</figcaption>
+        <figcaption>The demo, 42 seconds, with sound.</figcaption>
       </figure>
     )}
     {(problemShot || stepShots.some(Boolean)) && <p class="shots-note">Screenshots: Channel Almanac running on NASA’s public YouTube channel. Not affiliated with YouTube or NASA.</p>}
