@@ -1,0 +1,76 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+const clone = `git clone ${site.repo}.git`;
+const zipCmd = 'zip -r channel-almanac.zip manifest.json background.js content.js lib.js icons LICENSE';
+---
+<Base title="Install" description="Install Channel Almanac from GitHub in about a minute: Chrome, Edge, Brave, Arc and Firefox 121 or newer. Free, open source, no account.">
+  <header class="page-head" data-tone="paper">
+    <h1 class="page-head__title">Install</h1>
+    <p class="page-head__lede">It isn’t in the browser stores yet, so it installs from GitHub. About a minute, no account, in any Chromium browser or Firefox.</p>
+  </header>
+  <div class="page-body" data-tone="paper">
+    <ol class="steps">
+      <li class="step">
+        <p class="step__n" aria-hidden="true">1</p>
+        <div class="step__body">
+          <h2 class="step__title">Get the code</h2>
+          <p>Download the ZIP and unzip it somewhere permanent (the folder is called <code class="inline">channel-almanac-main</code>), or clone the repository.</p>
+          <p><a class="btn btn--solid" href={site.zip}>Download ZIP</a></p>
+          <div class="code"><code id="cmd-clone">{clone}</code><button type="button" data-copy="cmd-clone" hidden>Copy</button></div>
+        </div>
+      </li>
+      <li class="step">
+        <p class="step__n" aria-hidden="true">2</p>
+        <div class="step__body">
+          <h2 class="step__title">Load it in your browser</h2>
+          <div class="tablist" role="tablist" aria-label="Browser">
+            <button type="button" role="tab" id="tab-chromium" aria-controls="panel-chromium" aria-selected="true">Chrome, Edge, Brave, Arc</button>
+            <button type="button" role="tab" id="tab-firefox" aria-controls="panel-firefox" aria-selected="false" tabindex="-1">Firefox</button>
+          </div>
+          <div class="panel" id="panel-chromium" role="tabpanel" aria-labelledby="tab-chromium">
+            <h3 class="sr-only">Chrome, Edge, Brave, Arc</h3>
+            <ol>
+              <li>Open <code class="inline">chrome://extensions</code> (or <code class="inline">edge://extensions</code>) and turn on <b>Developer mode</b>.</li>
+              <li>Click <b>Load unpacked</b> and pick the folder you unzipped.</li>
+              <li>Reload any YouTube tabs that were already open.</li>
+            </ol>
+          </div>
+          <div class="panel" id="panel-firefox" role="tabpanel" aria-labelledby="tab-firefox" hidden>
+            <h3 class="sr-only">Firefox</h3>
+            <ol>
+              <li>Open <code class="inline">about:debugging#/runtime/this-firefox</code> and click <b>Load Temporary Add-on…</b></li>
+              <li>Pick the <code class="inline">manifest.json</code> file inside the folder.</li>
+              <li>Firefox asks for site access per site: click the extensions button in the toolbar and allow it on www.youtube.com.</li>
+            </ol>
+            <p class="note">Temporary add-ons are removed when Firefox restarts.</p>
+          </div>
+        </div>
+      </li>
+      <li class="step">
+        <p class="step__n" aria-hidden="true">3</p>
+        <div class="step__body">
+          <h2 class="step__title">Open any channel</h2>
+          <p>On a channel’s Videos tab, click <b>Dates</b> next to Latest, Popular and Oldest. Anywhere on YouTube, press <kbd>Alt</kbd> <kbd>Shift</kbd> <kbd>D</kbd>. The <a class="arrow-link" href="/guide/#open">guide <span aria-hidden="true">→</span></a> lists every way in.</p>
+        </div>
+      </li>
+    </ol>
+
+    <div class="split" style="margin-top: 5rem">
+      <h2 class="split__h">Updating</h2>
+      <div class="split__b">
+        <p>Pull the latest code (or download the ZIP again), then click the reload icon on the extension’s card in <code class="inline">chrome://extensions</code>, or <b>Reload</b> in <code class="inline">about:debugging</code>.</p>
+      </div>
+    </div>
+    <div class="split">
+      <h2 class="split__h">For developers</h2>
+      <div class="split__b">
+        <p>There is no build step: the files in the folder are the extension. Run the tests with Node 18 or newer, no dependencies to install:</p>
+        <div class="code"><code id="cmd-test">node --test</code><button type="button" data-copy="cmd-test" hidden>Copy</button></div>
+        <p>To build a ZIP for the Chrome Web Store or Firefox Add-ons:</p>
+        <div class="code"><code id="cmd-zip">{zipCmd}</code><button type="button" data-copy="cmd-zip" hidden>Copy</button></div>
+        <p>Bug reports and pull requests are welcome on <a class="arrow-link" href={site.issues}>GitHub <span aria-hidden="true">→</span></a></p>
+      </div>
+    </div>
+  </div>
+</Base>

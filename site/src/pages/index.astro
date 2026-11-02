@@ -1,0 +1,140 @@
+---
+import Base from '../layouts/Base.astro';
+import Demo from '../components/Demo.astro';
+import { site, features, facts, privacy, problem, steps, extras } from '../data/site';
+import { shot, media } from '../data/shots';
+import { exampleChannel, relativeLabel } from '../data/channel';
+import { fmt } from '../data/fmt';
+
+// "Now" is the build time: the example channel and its "3 years ago" are built around it.
+const NOW = Date.now();
+const ch = exampleChannel(NOW);
+const target = ch.uploads[ch.target];
+const label = relativeLabel(target.t, NOW);
+const pile = ch.uploads.filter((u) => relativeLabel(u.t, NOW) === label).length;
+const problemShot = await shot('problem.webp');
+const stepShots = await Promise.all(steps.map((s) => shot(s.shot)));
+const extraShots = await Promise.all(extras.map((s) => shot(s.shot)));
+const video = media('channel-almanac-demo.mp4');
+const poster = media('channel-almanac-demo.jpg');
+---
+<Base tone="marigold">
+  <section class="hero" data-tone="marigold" aria-labelledby="hero-title">
+    <p class="hero__poster">
+      <span class="hero__who">YouTube says</span>
+      <span class="hero__vague"><s>{label}</s></span>
+      <span class="hero__who">Channel Almanac says</span>
+      <span class="hero__exact"><span>{fmt.dayMonthYear(target.t)},</span> <span>{fmt.time(target.t)}</span></span>
+    </p>
+    <div class="hero__foot">
+      <h1 id="hero-title" class="hero__h1">Find anything a YouTube channel ever uploaded, by its exact date. Right on YouTube.</h1>
+      <div class="hero__ctas">
+        <a class="btn btn--solid" href="/install/">Install free</a>
+        <a class="btn btn--line" href={site.repo}>Source on GitHub</a>
+      </div>
+    </div>
+    <p class="hero__note">Example: {pile} uploads on the demo channel below say “{label}”. This is the one from {fmt.weekday(target.t)} {fmt.dayMonthYear(target.t)}.</p>
+  </section>
+
+  <section class="problem" data-tone="paper" aria-labelledby="problem-title">
+    <p class="kicker">The problem</p>
+    <h2 id="problem-title" class="problem__title">{problem.title}</h2>
+    <p class="problem__text">{problem.text}</p>
+    <dl class="problem__points">
+      {problem.points.map((p) => <div><dt>{p.k}</dt><dd>{p.v}</dd></div>)}
+    </dl>
+    {problemShot && (
+      <figure class="problem__shot">
+        <img src={problemShot.src} width={problemShot.width} height={problemShot.height} loading="lazy" decoding="async" alt="NASA’s Videos tab on YouTube: Latest, Popular and Oldest chips above a grid of uploads labelled only with how many years ago they went up." />
+        <figcaption>YouTube today: three sorts and “years ago”.</figcaption>
+      </figure>
+    )}
+    <p class="problem__fix">{problem.fix.split('Dates')[0]}<span class="hl">Dates</span>{problem.fix.split('Dates')[1]}</p>
+  </section>
+
+  <section class="how-to" data-tone="marigold" aria-labelledby="howto-title">
+    <div class="sec-head">
+      <h2 id="howto-title" class="sec-title">How to use it</h2>
+      {video && <a class="arrow-link" href="#demo-video">Watch the demo <span aria-hidden="true">↓</span></a>}
+    </div>
+    <ol class="cards">
+      {steps.map((s, i) => (
+        <li class="card" style={`--tilt:${[-1.6, 1.2, -0.8][i]}deg`}>
+          <p class="card__n" aria-hidden="true">{i + 1}</p>
+          <div class="card__frame">
+            {stepShots[i] ? (
+              <img src={stepShots[i]!.src} width={stepShots[i]!.width} height={stepShots[i]!.height} loading="lazy" decoding="async" alt={`${s.title}: ${s.text}`} />
+            ) : <div class="card__empty" aria-hidden="true"></div>}
+          </div>
+          <h3 class="card__title">{s.title}</h3>
+          <p class="card__text">{s.text}</p>
+        </li>
+      ))}
+    </ol>
+    {extraShots.some(Boolean) && (
+      <div class="extras">
+        {extras.map((s, i) => extraShots[i] && (
+          <figure class="extra">
+            <img src={extraShots[i]!.src} width={extraShots[i]!.width} height={extraShots[i]!.height} loading="lazy" decoding="async" alt={`${s.title}: ${s.text}`} />
+            <figcaption><b>{s.title}.</b> {s.text}</figcaption>
+          </figure>
+        ))}
+      </div>
+    )}
+    {video && (
+      <figure class="video" id="demo-video">
+        <video controls playsinline preload="none" poster={poster ?? undefined} width="1920" height="1080">
+          <source src={video} type="video/mp4" />
+        </video>
+        <figcaption>The demo, 40 seconds. Shown: NASA’s public YouTube channel. Not affiliated with YouTube or NASA.</figcaption>
+      </figure>
+    )}
+    {(problemShot || stepShots.some(Boolean)) && <p class="shots-note">Screenshots: Channel Almanac running on NASA’s public YouTube channel. Not affiliated with YouTube or NASA.</p>}
+  </section>
+
+  <Demo ch={ch} now={NOW} />
+
+  <section class="features" data-tone="paper" aria-labelledby="features-title">
+    <div class="sec-head">
+      <h2 id="features-title" class="sec-title">Everything in the panel</h2>
+      <a class="arrow-link" href="/guide/">Read the guide <span aria-hidden="true">→</span></a>
+    </div>
+    <ul class="rows">
+      {features.map((f) => (
+        <li>
+          <a class="row" href={`/guide/#${f.slug}`}>
+            <span class="row__name">{f.name}</span>
+            <span class="row__line">{f.line}</span>
+            <span class="row__key">{f.key ? <kbd>{f.key}</kbd> : null}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="how" data-tone="ink" aria-labelledby="how-title">
+    <div class="sec-head sec-head--split">
+      <h2 id="how-title" class="sec-title">How it gets exact dates</h2>
+      <p class="how__lede">YouTube’s list says “3 years ago” and nothing more. An exact time costs one request per video, so the panel asks about as few videos as it can, and only ever asks youtube.com.</p>
+    </div>
+    <ul class="facts">
+      {facts.map((f) => (
+        <li class="fact">
+          <p class="fact__n">{f.n}</p>
+          <p class="fact__unit">{f.unit}</p>
+          <p class="fact__text">{f.text}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="priv" data-tone="paper" aria-labelledby="priv-title">
+    <h2 id="priv-title" class="priv__title">The only site it talks to is <span class="hl">youtube.com</span>.</h2>
+    <div class="priv__body">
+      <ul class="priv__list">
+        {privacy.map((p) => <li>{p}</li>)}
+      </ul>
+      <a class="arrow-link" href="/privacy/">Privacy and permissions <span aria-hidden="true">→</span></a>
+    </div>
+  </section>
+</Base>

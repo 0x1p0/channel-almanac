@@ -1,0 +1,49 @@
+---
+// "Type a date": the extension's own parser (lib.js parseDateQuery) and search (probes, select)
+// running on the example channel. The server renders a real first result; the browser takes over.
+import lib from 'virtual:almanac-lib';
+import History from './History.astro';
+import { examples } from '../data/site';
+import { runSearch, type Channel } from '../data/channel';
+import { fmt } from '../data/fmt';
+
+interface Props { ch: Channel; now: number }
+const { ch, now } = Astro.props;
+const first = 'march 2019';
+const f = lib.parseDateQuery(first, new Date(now));
+const s = runSearch(lib, ch, f);
+const from = new Date(f.from + 'T12:00:00').getTime();
+const to = new Date(f.to + 'T12:00:00').getTime();
+---
+<section class="demo" data-tone="paper" id="try" aria-labelledby="demo-title" data-demo data-now={now}>
+  <div class="demo__head">
+    <p class="kicker">Try it here</p>
+    <h2 id="demo-title" class="sec-title">Type a date the way you would say it.</h2>
+    <p class="demo__lede">This is the extension’s own parser and search, running in your browser on an example channel with {fmt.count(ch.uploads.length)} uploads since {new Date(ch.start).getFullYear()}.</p>
+  </div>
+
+  <form class="demo__form" data-demo-form role="search" aria-label="Try the date parser">
+    <label class="demo__label" for="demo-q">Date</label>
+    <div class="demo__field">
+      <input id="demo-q" class="demo__input" name="q" type="text" value={first} autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="demo-hint" />
+      <button class="demo__go" type="submit" aria-label="Find this range">↵</button>
+    </div>
+    <p id="demo-hint" class="demo__hint">Try one of these, or your own:</p>
+    <ul class="demo__examples">
+      {examples.map((e) => <li><button type="button" class="chip" data-example={e}>{e}</button></li>)}
+    </ul>
+  </form>
+
+  <output class="demo__out" for="demo-q" aria-live="polite" data-demo-out>
+    <p class="demo__result" data-r-title>March 2019</p>
+    <dl class="demo__facts">
+      <div><dt>From</dt><dd data-r-from>{fmt.shortDay(from)}</dd></div>
+      <div><dt>To</dt><dd data-r-to>{fmt.shortDay(to)}</dd></div>
+      <div><dt>Uploads</dt><dd data-r-count>{fmt.count(s.found.length)}</dd></div>
+      <div><dt>Lookups</dt><dd data-r-lookups>{s.lookups}</dd></div>
+    </dl>
+    <p class="demo__note" data-r-note>{s.lookups} lookups decided every one of the {fmt.count(ch.uploads.length)} uploads in or out.</p>
+  </output>
+
+  <History ch={ch} selected={s.found} />
+</section>

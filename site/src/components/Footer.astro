@@ -1,0 +1,37 @@
+---
+import { site } from '../data/site';
+const year = new Date().getFullYear();
+---
+<footer class="foot" data-tone="marigold">
+  <div class="foot__cta">
+    <p class="foot__lead">Free and open source. Version {site.version}, MIT licence.</p>
+    <a class="foot__big" href="/install/">Install Channel Almanac <span aria-hidden="true">→</span></a>
+    <p class="foot__lead">Works in {site.browsers}.</p>
+  </div>
+  <div class="foot__cols">
+    <nav aria-label="Site">
+      <h2 class="foot__h">Site</h2>
+      <ul>
+        <li><a class="ul" href="/">Home</a></li>
+        {site.nav.map((n) => <li><a class="ul" href={n.href}>{n.label}</a></li>)}
+      </ul>
+    </nav>
+    <nav aria-label="Project">
+      <h2 class="foot__h">Project</h2>
+      <ul>
+        <li><a class="ul" href={site.repo}>Source on GitHub</a></li>
+        <li><a class="ul" href={site.zip}>Download ZIP</a></li>
+        <li><a class="ul" href={site.issues}>Report a problem</a></li>
+        <li><a class="ul" href={site.license}>MIT licence</a></li>
+      </ul>
+    </nav>
+    <div class="foot__colophon">
+      <h2 class="foot__h">Colophon</h2>
+      <p>Set in Archivo and Fragment Mono. The colour is marigold; the flower’s Latin name, <i>Calendula</i>, comes from the calends, the first day of every month.</p>
+    </div>
+  </div>
+  <p class="foot__fine">
+    <span>© {year} Channel Almanac.</span>
+    <span>An independent project, not affiliated with, endorsed or sponsored by YouTube or Google. YouTube is a trademark of Google LLC.</span>
+  </p>
+</footer>

@@ -12,3 +12,12 @@ Thumbs.db
 web-ext-artifacts/
 
 node_modules/
+
+# Website (site/)
+site/node_modules/
+site/dist/
+site/.astro/
+site/.shots/
+site/.shots-log.txt
+site/.media/
+site/.verify/

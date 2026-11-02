@@ -1,0 +1,50 @@
+---
+// Whole history of the example channel: a row per year, a column per day (weeks on phones).
+import { paths, GRID, SLOT_START } from '../data/history';
+import type { Channel } from '../data/channel';
+import { fmt } from '../data/fmt';
+
+interface Props { ch: Channel; selected?: number[] }
+const { ch, selected = [] } = Astro.props;
+const set = new Set(selected);
+const sel = (list: number[]) => list.some((i) => set.has(i));
+const day = paths(ch, 'day', sel);
+const week = paths(ch, 'week', sel);
+const busiest = Object.entries(
+  ch.uploads.reduce<Record<number, number>>((a, u) => { const y = new Date(u.t).getFullYear(); a[y] = (a[y] || 0) + 1; return a; }, {}),
+).sort((a, b) => b[1] - a[1])[0];
+const summary = `Whole history of the example channel: ${fmt.count(ch.uploads.length)} uploads from ${fmt.monthYear(ch.start)} to ${fmt.monthYear(ch.now)}, busiest in ${busiest[0]} with ${busiest[1]}.`;
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+---
+<figure class="history" data-history style={`--rows:${day.years.length}`}>
+  <div class="history__months" aria-hidden="true">
+    {months.map((m, i) => <span style={`--x:${(SLOT_START[i] / 366) * 100}%`}>{m}</span>)}
+  </div>
+  <div class="history__body">
+    <ol class="history__years" aria-hidden="true">
+      {day.years.map((y) => <li>{y}</li>)}
+    </ol>
+    <div class="history__plots">
+      <svg class:list={["history__svg history__svg--day", selected.length && "has-sel"]} viewBox={`0 0 ${day.width} ${day.height}`} preserveAspectRatio="none" role="img" aria-label={summary} data-mode="day" data-pitch={GRID.day.pitch} data-row={GRID.day.row}>
+        <path class="h-band" d={day.bands} />
+        <path class="h-l1" d={day.levels[1]} />
+        <path class="h-l2" d={day.levels[2]} />
+        <path class="h-sel" d={day.picked} data-sel />
+        <rect class="h-hover" width={GRID.day.cell} height={GRID.day.h} data-hover />
+      </svg>
+      <svg class:list={["history__svg history__svg--week", selected.length && "has-sel"]} viewBox={`0 0 ${week.width} ${week.height}`} preserveAspectRatio="none" role="img" aria-label={summary} data-mode="week" data-pitch={GRID.week.pitch} data-row={GRID.week.row}>
+        <path class="h-band" d={week.bands} />
+        <path class="h-l0" d={week.levels[0]} />
+        <path class="h-l1" d={week.levels[1]} />
+        <path class="h-l2" d={week.levels[2]} />
+        <path class="h-sel" d={week.picked} data-sel />
+        <rect class="h-hover" width={GRID.week.cell} height={GRID.week.h} data-hover />
+      </svg>
+      <p class="history__tip" data-tip aria-hidden="true"></p>
+    </div>
+  </div>
+  <figcaption class="history__cap">
+    <span>Whole history, a row per year. Each mark is a day with an upload; the range you type turns ink.</span>
+    <span class="history__legend" aria-hidden="true"><i class="lg lg--1"></i>1 <i class="lg lg--2"></i>2 or more <i class="lg lg--sel"></i>in range</span>
+  </figcaption>
+</figure>

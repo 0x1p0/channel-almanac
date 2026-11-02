@@ -1,0 +1,21 @@
+---
+import { site } from '../data/site';
+import Mark from './Mark.astro';
+interface Props { tone?: string }
+const { tone = 'paper' } = Astro.props;
+const path = Astro.url.pathname;
+---
+<header class="head" data-tone={tone}>
+  <a class="head__brand" href="/" aria-label="Channel Almanac, home">
+    <Mark size={28} />
+    <span class="head__name" aria-hidden="true">Channel Almanac</span>
+  </a>
+  <nav class="head__nav" aria-label="Main">
+    <ul>
+      {site.nav.map((n) => (
+        <li><a class="nav-link" href={n.href} aria-current={path.startsWith(n.href) ? 'page' : undefined}>{n.label}</a></li>
+      ))}
+      <li class="head__gh"><a class="nav-link" href={site.repo}>GitHub</a></li>
+    </ul>
+  </nav>
+</header>

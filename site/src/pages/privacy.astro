@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import { privacy, permissions } from '../data/site';
+---
+<Base title="Privacy" description="Channel Almanac has no analytics, no accounts and no servers. It talks only to youtube.com, signed out, and keeps what it saves in your browser.">
+  <header class="page-head" data-tone="paper">
+    <h1 class="page-head__title">Privacy</h1>
+    <p class="page-head__lede">The only site it talks to is youtube.com. There is no server of its own to send anything to.</p>
+  </header>
+  <div class="page-body" data-tone="paper">
+    <section class="split" aria-labelledby="p-what">
+      <h2 class="split__h" id="p-what">What it does with your data</h2>
+      <div class="split__b"><ul>{privacy.map((p) => <li>{p}</li>)}</ul></div>
+    </section>
+    <section class="split" aria-labelledby="p-perm">
+      <h2 class="split__h" id="p-perm">Permissions</h2>
+      <div class="split__b">
+        <table class="ptable">
+          <thead><tr><th scope="col">Permission</th><th scope="col">Why</th></tr></thead>
+          <tbody>{permissions.map((p) => <tr><td>{p.name}</td><td>{p.why}</td></tr>)}</tbody>
+        </table>
+      </div>
+    </section>
+    <section class="split" aria-labelledby="p-gentle">
+      <h2 class="split__h" id="p-gentle">Being gentle with YouTube</h2>
+      <div class="split__b">
+        <ul>
+          <li>At most 3 lookups at once, with gaps between them. Calendar and background lookups go one at a time, under two a second.</li>
+          <li>Opening a 1,000‑video channel takes about 10 to 15 list requests; a date range about 15 to 30 lookups. Reopening a saved channel takes 1 to 3.</li>
+          <li>If YouTube asks it to slow down, it pauses for a minute and resumes on its own.</li>
+        </ul>
+      </div>
+    </section>
+    <section class="split" aria-labelledby="p-indep">
+      <h2 class="split__h" id="p-indep">Independent</h2>
+      <div class="split__b">
+        <p>Channel Almanac is an independent, MIT‑licensed project with no ties to YouTube or Google. The code is public, so every request it makes can be read in <code class="inline">content.js</code>.</p>
+      </div>
+    </section>
+  </div>
+</Base>

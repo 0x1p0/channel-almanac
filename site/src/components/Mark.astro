@@ -1,0 +1,26 @@
+---
+// The extension's icon: a calendar page with one day found.
+interface Props { size?: number; class?: string }
+const { size = 32, class: cls } = Astro.props;
+---
+<svg class:list={['mark', cls]} viewBox="8 8 112 112" width={size} height={size} aria-hidden="true" focusable="false">
+  <rect x="8" y="8" width="112" height="112" rx="26" fill="#F2A516" />
+  <rect x="26" y="34" width="76" height="66" rx="10" fill="#FFF6E3" />
+  <path d="M26 44a10 10 0 0 1 10-10h56a10 10 0 0 1 10 10v8H26z" fill="#1F1500" />
+  <rect x="42" y="24" width="9" height="18" rx="4.5" fill="#1F1500" />
+  <rect x="77" y="24" width="9" height="18" rx="4.5" fill="#1F1500" />
+  <g class="mark__days">
+    <rect x="34" y="58" width="12" height="9" rx="2.5" fill="#FBE2AC" />
+    <rect x="50" y="58" width="12" height="9" rx="2.5" fill="#F6C35E" />
+    <rect x="66" y="58" width="12" height="9" rx="2.5" fill="#FBE2AC" />
+    <rect x="82" y="58" width="12" height="9" rx="2.5" fill="#EA9C25" />
+    <rect x="34" y="71.5" width="12" height="9" rx="2.5" fill="#F6C35E" />
+    <rect x="50" y="71.5" width="12" height="9" rx="2.5" fill="#FBE2AC" />
+    <rect x="82" y="71.5" width="12" height="9" rx="2.5" fill="#F6C35E" />
+    <rect x="34" y="85" width="12" height="9" rx="2.5" fill="#EA9C25" />
+    <rect x="50" y="85" width="12" height="9" rx="2.5" fill="#FBE2AC" />
+    <rect x="66" y="85" width="12" height="9" rx="2.5" fill="#F6C35E" />
+    <rect x="82" y="85" width="12" height="9" rx="2.5" fill="#FBE2AC" />
+  </g>
+  <rect class="mark__found" x="66" y="71.5" width="12" height="9" rx="2.5" fill="#1F1500" />
+</svg>

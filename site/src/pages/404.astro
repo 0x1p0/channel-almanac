@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Not found" description="No page was published at this address. The closest pages are one click away.">
+  <section class="lost" data-tone="paper" aria-labelledby="lost-title">
+    <p class="lost__kicker">Never a dead end</p>
+    <h1 class="lost__title" id="lost-title">No uploads here.</h1>
+    <p class="lost__text">Nothing was ever published at <span class="lost__path" data-path>this address</span>. When a range is empty, the panel points at the closest uploads either side. So does this page.</p>
+    <div class="lost__near">
+      <a class="jump" href="/"><span class="jump__k">Closest before</span><span class="jump__v">Home</span><span class="jump__s">Try the date demo</span></a>
+      <a class="jump" href="/guide/"><span class="jump__k">Closest after</span><span class="jump__v">Guide</span><span class="jump__s">Every feature</span></a>
+    </div>
+  </section>
+  <script is:inline>document.querySelector('[data-path]').textContent = location.pathname;</script>
+</Base>

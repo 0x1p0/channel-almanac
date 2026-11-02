@@ -1,0 +1,49 @@
+---
+import Base from '../layouts/Base.astro';
+import { guide, keys, openWays } from '../data/site';
+---
+<Base title="Guide" description="Every feature of Channel Almanac: the five ways to open it, typed dates, Whole history, Standouts, Play in order, copy links and every keyboard shortcut.">
+  <header class="page-head" data-tone="paper">
+    <h1 class="page-head__title">Guide</h1>
+    <p class="page-head__lede">Everything the panel does, and how to reach it. It all happens on YouTube itself, in a panel beside the channel.</p>
+  </header>
+  <div class="page-body" data-tone="paper">
+    <div class="guide">
+      <nav class="toc" aria-label="On this page">
+        <h2>On this page</h2>
+        <ul>
+          <li><a class="nav-link" href="#open">Open it</a></li>
+          {guide.map((c) => <li><a class="nav-link" href={`#${c.id}`}>{c.title}</a></li>)}
+          <li><a class="nav-link" href="#keyboard">Keyboard</a></li>
+        </ul>
+      </nav>
+      <div class="entries">
+        <section class="chapter" aria-labelledby="open">
+          <h2 class="chapter__title" id="open">Open it</h2>
+          {openWays.map((w) => (
+            <div class="entry"><h3>{w.name}</h3><p>{w.text}</p></div>
+          ))}
+        </section>
+        {guide.map((c) => (
+          <section class="chapter" aria-labelledby={c.id}>
+            <h2 class="chapter__title" id={c.id}>{c.title}</h2>
+            {c.entries.map((e) => (
+              <div class="entry" id={e.id}>
+                <h3>{e.name}{e.key && <kbd>{e.key}</kbd>}</h3>
+                <p>{e.text}</p>
+              </div>
+            ))}
+          </section>
+        ))}
+        <section class="chapter" aria-labelledby="keyboard">
+          <h2 class="chapter__title" id="keyboard">Keyboard</h2>
+          <dl class="keys">
+            {keys.map((k) => (
+              <div><dt>{k.k.map((x) => <kbd>{x}</kbd>)}</dt><dd>{k.does}</dd></div>
+            ))}
+          </dl>
+        </section>
+      </div>
+    </div>
+  </div>
+</Base>
