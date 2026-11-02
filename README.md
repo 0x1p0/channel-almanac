@@ -37,7 +37,7 @@ Temporary add-ons are removed when Firefox restarts.
 - The **Dates** chip next to Latest / Popular / Oldest on a channel's Videos, Shorts or Live tab
 - The **Dates** tab on the right edge on every other channel page (Home, Playlists, Posts…)
 - The calendar button right after Share on a video (same round style as YouTube's own buttons), which opens the panel on the week around that video
-- The toolbar button or **Alt+Shift+D** anywhere on YouTube (on a video, it opens that video's channel around that video)
+- The toolbar button or **Alt+Shift+D** (**⌥⇧D** on a Mac) anywhere on YouTube (on a video, it opens that video's channel around that video). You can change it in your browser's extension shortcut settings, e.g. `chrome://extensions/shortcuts`
 - A copied view link (see below)
 
 ## What it does

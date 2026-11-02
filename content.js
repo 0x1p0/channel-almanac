@@ -746,6 +746,14 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
 
   // ---------- DOM ----------
 
+  // The keyboard shortcut as this browser has it: ⌥⇧D on a Mac, Alt+Shift+D elsewhere, or whatever
+  // the person set in the browser's shortcut settings ('' when none is set). The guess is replaced by
+  // the real one from the background worker as soon as it answers.
+  const IS_MAC = /mac/i.test((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '');
+  const macKeys = k => k.replace(/Alt\+?/g, '⌥').replace(/Shift\+?/g, '⇧').replace(/(?:MacCtrl|Ctrl)\+?/g, '⌃').replace(/(?:Command|Cmd)\+?/g, '⌘');
+  let shortcut = IS_MAC ? '⌥⇧D' : 'Alt+Shift+D';
+  const withKey = s => (shortcut ? `${s} (${shortcut})` : s);
+
   const host = document.createElement('div');
   host.id = 'channel-almanac';
   const root = host.attachShadow({ mode: 'open' });
@@ -754,7 +762,7 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
   root.appendChild(style);
   const shell = document.createElement('div');
   setHTML(shell, `
-    <button class="launch" data-act="open" hidden aria-label="Browse this channel's uploads by date" title="Browse uploads by date (Alt+Shift+D)">${ICON.cal}<span>Dates</span></button>
+    <button class="launch" data-act="open" hidden aria-label="Browse this channel's uploads by date" title="${esc(withKey('Browse uploads by date'))}">${ICON.cal}<span>Dates</span></button>
     <aside class="drawer" role="dialog" aria-label="Uploads by date" tabindex="-1" hidden>
       <div class="resizer" id="resizer" role="separator" aria-orientation="vertical" aria-label="Resize panel" tabindex="0" title="Drag to resize · double-click to reset"></div>
       <header class="top">
@@ -783,7 +791,7 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
           <dt><kbd>Esc</kbd></dt><dd>Close</dd>
           <dt><kbd>?</kbd></dt><dd>Show this list</dd>
         </dl>
-        <p class="fine">Drag across days or years to pick a range. Alt+Shift+D opens the panel anywhere on YouTube.</p>
+        <p class="fine" id="fineKeys"></p>
       </div>
     </aside>
     <div class="hist-ov" id="histOv" role="dialog" aria-modal="true" aria-label="Whole history" tabindex="-1" hidden>
@@ -2086,7 +2094,7 @@ svg { width: 18px; height: 18px; fill: currentColor; }`;
     sr.appendChild(st);
     const b = document.createElement('button');
     b.type = 'button';
-    b.title = 'Filter this channel’s uploads by date (Alt+Shift+D)';
+    b.title = withKey('Filter this channel’s uploads by date');
     setHTML(b, `${ICON.cal}<span>Dates</span>`);
     b.addEventListener('click', e => { e.stopPropagation(); if (S.open) closeDrawer(); else openDrawer(); });
     sr.appendChild(b);
@@ -2118,7 +2126,7 @@ svg { width: 18px; height: 18px; fill: currentColor; }`;
   // copied from the Share button, so it gets exactly the same size, shape, colour, hover and icon size.
   const YT_BTN = 'ytSpecButtonShapeNextHost ytSpecButtonShapeNextTonal ytSpecButtonShapeNextMono ytSpecButtonShapeNextSizeM ytSpecButtonShapeNextIconButton';
   const CAL_PATH = 'M8 2v2h8V2h1.5v2H19a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1.5V2H8Zm11 7.5H5V19c0 .28.22.5.5.5h13a.5.5 0 0 0 .5-.5V9.5ZM5.5 5.5A.5.5 0 0 0 5 6v2h14V6a.5.5 0 0 0-.5-.5h-13ZM15 13h2.5v2.5H15V13Z';
-  const WATCH_TIP = '<strong>Uploads around this video</strong> <span class="t">Alt+Shift+D</span>';
+  const watchTip = () => `<strong>Uploads around this video</strong>${shortcut ? ` <span class="t">${esc(shortcut)}</span>` : ''}`;
   let watchTipOn = false;
 
   function calSvg(size) {
@@ -2146,7 +2154,7 @@ svg { width: 18px; height: 18px; fill: currentColor; }`;
       S.aroundReq = true;
       if (S.open) load(); else openDrawer();
     });
-    const showT = () => { watchTipOn = true; placeTip(b, WATCH_TIP); };
+    const showT = () => { watchTipOn = true; placeTip(b, watchTip()); };
     const hideT = () => { if (watchTipOn) { watchTipOn = false; hideTip(); } };
     b.addEventListener('mouseenter', showT);
     b.addEventListener('mouseleave', hideT);
@@ -2315,6 +2323,23 @@ button:focus-visible { outline: 2px solid #3ea6ff; outline-offset: 2px; }`;
     ensureWatchButton();
   }, 1000);
   setInterval(() => { if (S.open && S.view === 'main' && !S.status) updateMeta(); }, 30000);
+
+  // Put the shortcut everywhere it's named, then ask the background worker for the real one.
+  function showShortcut() {
+    const launch = root.querySelector('.launch');
+    if (launch) launch.title = withKey('Browse uploads by date');
+    const fine = $('#fineKeys');
+    if (fine) fine.textContent = `Drag across days or years to pick a range.${shortcut ? ` ${shortcut} opens the panel anywhere on YouTube.` : ''}`;
+    document.querySelectorAll('[data-cdf-chip]').forEach(w => { const b = w.shadowRoot && w.shadowRoot.querySelector('button'); if (b) b.title = withKey('Filter this channel’s uploads by date'); });
+  }
+  showShortcut();
+  try {
+    chrome.runtime.sendMessage({ type: 'shortcut' }, r => {
+      if (chrome.runtime.lastError || typeof r !== 'string') return;
+      shortcut = IS_MAC && r.includes('+') ? macKeys(r) : r;
+      showShortcut();
+    });
+  } catch (e) { /* extension context gone */ }
 
   try {
     // Always answer: an unanswered message rejects in the background worker, which would then
