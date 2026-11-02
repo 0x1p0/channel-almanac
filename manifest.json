@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Channel Date Finder",
-  "version": "3.2.1",
+  "version": "1.0.0",
   "description": "Find any YouTube channel's uploads by exact date: date ranges, On this day, Shorts and live filters, play a range in order.",
+  "homepage_url": "https://github.com/0x1p0/channel-date-finder",
   "permissions": [
     "storage",
     "unlimitedStorage",
@@ -13,7 +14,10 @@
     "https://www.youtube.com/*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "scripts": [
+      "background.js"
+    ]
   },
   "action": {
     "default_title": "Filter this channel by date (Alt+Shift+D)",
