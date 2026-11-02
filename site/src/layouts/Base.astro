@@ -58,7 +58,17 @@ const jsonLd = {
     <meta name="twitter:image" content={ogImage} />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     <link rel="preload" href="/fonts/archivo-100_900-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <script is:inline>document.documentElement.classList.add('js');</script>
+    <script is:inline>
+      // Before first paint: which keys and which extensions page to show (see Shortcut.astro, ExtPage.astro).
+      (function () {
+        var d = document.documentElement, ua = navigator.userAgent;
+        var p = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+        var touchMac = /mac/i.test(p) && navigator.maxTouchPoints > 1;
+        d.classList.add('js');
+        d.dataset.os = /android|iphone|ipad|ipod/i.test(ua) || touchMac ? 'mobile' : /mac/i.test(p) ? 'mac' : /win|linux|cros|x11/i.test(p + ' ' + ua) ? 'pc' : 'other';
+        d.dataset.browser = navigator.brave ? 'brave' : /Edg\//.test(ua) ? 'edge' : /OPR\//.test(ua) ? 'opera' : /Vivaldi/.test(ua) ? 'vivaldi' : /Firefox\//.test(ua) ? 'firefox' : /Chrome\//.test(ua) ? 'chrome' : /Safari\//.test(ua) ? 'safari' : 'other';
+      })();
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>

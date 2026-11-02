@@ -1,6 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import { site } from '../data/site';
+import Shortcut from '../components/Shortcut.astro';
+import ExtPage from '../components/ExtPage.astro';
 const clone = `git clone ${site.repo}.git`;
 const zipCmd = 'zip -r channel-almanac.zip manifest.json background.js content.js lib.js icons LICENSE';
 ---
@@ -10,6 +12,8 @@ const zipCmd = 'zip -r channel-almanac.zip manifest.json background.js content.j
     <p class="page-head__lede">It isn’t in the browser stores yet, so it installs from GitHub. About a minute, no account, in any Chromium browser or Firefox.</p>
   </header>
   <div class="page-body" data-tone="paper">
+    <p class="note only-safari">Channel Almanac runs in Chrome, Edge, Brave, Arc and Firefox. Safari isn’t supported, so open this page in one of those.</p>
+    <p class="note only-mobile">Channel Almanac is a desktop browser extension. Open this page on your computer to install it.</p>
     <ol class="steps">
       <li class="step">
         <p class="step__n" aria-hidden="true">1</p>
@@ -31,7 +35,7 @@ const zipCmd = 'zip -r channel-almanac.zip manifest.json background.js content.j
           <div class="panel" id="panel-chromium" role="tabpanel" aria-labelledby="tab-chromium">
             <h3 class="sr-only">Chrome, Edge, Brave, Arc</h3>
             <ol>
-              <li>Open <code class="inline">chrome://extensions</code> (or <code class="inline">edge://extensions</code>) and turn on <b>Developer mode</b>.</li>
+              <li>Open <ExtPage /> and turn on <b>Developer mode</b>.</li>
               <li>Click <b>Load unpacked</b> and pick the folder you unzipped.</li>
               <li>Reload any YouTube tabs that were already open.</li>
             </ol>
@@ -51,7 +55,8 @@ const zipCmd = 'zip -r channel-almanac.zip manifest.json background.js content.j
         <p class="step__n" aria-hidden="true">3</p>
         <div class="step__body">
           <h2 class="step__title">Open any channel</h2>
-          <p>On a channel’s Videos tab, click <b>Dates</b> next to Latest, Popular and Oldest. Anywhere on YouTube, press <kbd>Alt</kbd> <kbd>Shift</kbd> <kbd>D</kbd>. The <a class="arrow-link" href="/guide/#open">guide <span aria-hidden="true">→</span></a> lists every way in.</p>
+          <p>On a channel’s Videos tab, click <b>Dates</b> next to Latest, Popular and Oldest. Anywhere on YouTube, press <Shortcut />. The <a class="arrow-link" href="/guide/#open">guide <span aria-hidden="true">→</span></a> lists every way in.</p>
+          <p class="muted-note">Want different keys? Open <ExtPage shortcuts /><span class="only-firefox">, then the gear menu, Manage Extension Shortcuts</span>.</p>
         </div>
       </li>
     </ol>

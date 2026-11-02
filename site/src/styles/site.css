@@ -334,6 +334,14 @@ code.inline { font-family: var(--f-mono); font-size: 0.9em; padding: 0.05em 0.3e
 .lost__near .jump { min-width: 14rem; border-width: 1.5px; }
 .lost__near .jump__v { font-family: var(--f-display); font-size: 1.5rem; font-variation-settings: 'wdth' 112, 'wght' 720; letter-spacing: -0.02em; }
 
+/* ---------- per visitor: keys for their OS, notes for their browser (html data-os / data-browser) ---------- */
+html[data-os='mac'] .shortcut__pc, html[data-os='pc'] .shortcut__mac, html[data-os='mac'] .shortcut__or { display: none; }
+.shortcut__keys { white-space: nowrap; }
+.only-firefox, .only-safari, .only-mobile { display: none; }
+html[data-browser='firefox'] .only-firefox { display: inline; }
+html[data-browser='safari']:not([data-os='mobile']) .only-safari, html[data-os='mobile'] .only-mobile { display: block; margin-bottom: 2.5rem; }
+.muted-note { color: var(--c-muted); font-size: 0.9375rem; }
+
 /* ---------- smaller screens ---------- */
 @media (max-width: 1023px) {
   .cards { grid-template-columns: 1fr 1fr; row-gap: 3.5rem; }

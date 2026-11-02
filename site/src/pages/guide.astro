@@ -1,6 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import { guide, keys, openWays } from '../data/site';
+import Shortcut from '../components/Shortcut.astro';
+import ExtPage from '../components/ExtPage.astro';
 ---
 <Base title="Guide" description="Every feature of Channel Almanac: the five ways to open it, typed dates, Whole history, Standouts, Play in order, copy links and every keyboard shortcut.">
   <header class="page-head" data-tone="paper">
@@ -21,7 +23,10 @@ import { guide, keys, openWays } from '../data/site';
         <section class="chapter" aria-labelledby="open">
           <h2 class="chapter__title" id="open">Open it</h2>
           {openWays.map((w) => (
-            <div class="entry"><h3>{w.name}</h3><p>{w.text}</p></div>
+            <div class="entry" id={w.shortcut ? 'shortcut' : undefined}>
+              <h3>{w.name}</h3>
+              {w.shortcut ? <p>Press <Shortcut /> {w.text} To change the keys, open <ExtPage shortcuts /><span class="only-firefox">, then the gear menu, Manage Extension Shortcuts</span>.</p> : <p>{w.text}</p>}
+            </div>
           ))}
         </section>
         {guide.map((c) => (

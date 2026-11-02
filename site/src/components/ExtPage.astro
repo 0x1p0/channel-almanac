@@ -1,0 +1,8 @@
+---
+// The visitor's own extensions page (brave://extensions, edge://extensions…). Browsers don't let
+// pages link to these, so it is shown as text to type. chrome:// works in every Chromium browser,
+// so it is the fallback; scripts/site.ts swaps in the visitor's browser.
+interface Props { shortcuts?: boolean }
+const { shortcuts = false } = Astro.props;
+---
+<code class="inline" data-ext-page={shortcuts ? 'shortcuts' : 'list'}>{shortcuts ? 'chrome://extensions/shortcuts' : 'chrome://extensions'}</code>

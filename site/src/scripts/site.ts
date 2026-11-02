@@ -149,6 +149,16 @@ function demo(root: HTMLElement) {
 }
 
 // Install page: Chromium / Firefox tabs (both panels show without JS).
+const browser = document.documentElement.dataset.browser ?? 'other';
+
+// The visitor's own extensions page; chrome:// stays for Chrome, Arc and anything unknown.
+function extPages() {
+  const scheme = ({ brave: 'brave', edge: 'edge', opera: 'opera', vivaldi: 'vivaldi' } as Record<string, string>)[browser] ?? 'chrome';
+  document.querySelectorAll<HTMLElement>('[data-ext-page]').forEach((el) => {
+    el.textContent = browser === 'firefox' ? 'about:addons' : `${scheme}://extensions${el.dataset.extPage === 'shortcuts' ? '/shortcuts' : ''}`;
+  });
+}
+
 function tabs(list: HTMLElement) {
   const all = [...list.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
   const pick = (t: HTMLButtonElement, focus = false) => {
@@ -170,7 +180,8 @@ function tabs(list: HTMLElement) {
     pick(all[j], true);
   });
   list.classList.add('is-live');
-  pick(all.find((t) => t.getAttribute('aria-selected') === 'true') ?? all[0]);
+  // Firefox visitors land on the Firefox steps.
+  pick(all.find((t) => browser === 'firefox' && t.id === 'tab-firefox') ?? all.find((t) => t.getAttribute('aria-selected') === 'true') ?? all[0]);
 }
 
 function copy(b: HTMLButtonElement) {
@@ -187,6 +198,7 @@ function copy(b: HTMLButtonElement) {
   });
 }
 
+extPages();
 const demoRoot = document.querySelector<HTMLElement>('[data-demo]');
 if (demoRoot) demo(demoRoot);
 document.querySelectorAll<HTMLElement>('[role="tablist"]').forEach(tabs);

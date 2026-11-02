@@ -71,11 +71,11 @@ export const keys = [
   { k: ['?'], does: 'Show shortcuts' },
 ];
 
-export const openWays = [
+export const openWays: { name: string; text: string; shortcut?: boolean }[] = [
   { name: 'The Dates chip', text: 'Next to Latest, Popular and Oldest on a channel’s Videos, Shorts or Live tab.' },
   { name: 'The Dates tab', text: 'On the right edge of every other channel page: Home, Playlists, Posts.' },
   { name: 'The calendar button', text: 'Right after Share on a video. It opens the panel on the week around that video.' },
-  { name: 'Alt+Shift+D', text: 'Or the toolbar button, anywhere on YouTube. On a video, it opens that video’s channel around it.' },
+  { name: 'Keyboard shortcut', text: 'anywhere on YouTube, or click the toolbar button. On a video, it opens that video’s channel around it.', shortcut: true },
   { name: 'A copied view link', text: 'Anyone who opens a link made with Copy link lands on the same filtered view.' },
 ];
 

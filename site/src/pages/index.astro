@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import Demo from '../components/Demo.astro';
 import { site, features, facts, privacy, problem, steps, extras } from '../data/site';
 import { shot, media } from '../data/shots';
+import Shortcut from '../components/Shortcut.astro';
 import { exampleChannel, relativeLabel } from '../data/channel';
 import { fmt } from '../data/fmt';
 
@@ -65,7 +66,7 @@ const poster = media('channel-almanac-demo.jpg');
             {stepShots[i] ? (
               <img src={stepShots[i]!.src} width={stepShots[i]!.width} height={stepShots[i]!.height} loading="lazy" decoding="async" alt={s.alt} />
             ) : <div class="card__empty" aria-hidden="true"></div>}
-            {s.fit === 'chip' && <p class="card__keys">or press <kbd>Alt</kbd> <kbd>Shift</kbd> <kbd>D</kbd> anywhere on YouTube</p>}
+            {s.fit === 'chip' && <p class="card__keys">or press <Shortcut /> anywhere on YouTube</p>}
           </div>
           <h3 class="card__title">{s.title}</h3>
           <p class="card__text">{s.text}</p>
