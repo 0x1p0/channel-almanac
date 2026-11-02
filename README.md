@@ -8,6 +8,12 @@ A free, open-source browser extension that lets you find anything a YouTube chan
 
 Works in Chrome, Edge, Brave, Arc and other Chromium browsers (121 or newer), and in Firefox (121 or newer).
 
+**Website: [channel-almanac.vercel.app](https://channel-almanac.vercel.app)**
+
+[![Watch the 42-second demo: Channel Almanac finding NASA's uploads from February 2021](site/public/media/channel-almanac-demo.jpg)](https://channel-almanac.vercel.app/media/channel-almanac-demo.mp4)
+
+▶ [Watch the 42-second demo](https://channel-almanac.vercel.app/media/channel-almanac-demo.mp4) (with sound), recorded on NASA's public YouTube channel.
+
 ## Install
 
 The extension isn't in the browser stores yet, so install it from this repository.
@@ -116,6 +122,7 @@ There's no build step: the files in this folder are the extension.
 | `lib.js` | Pure helpers: parsing YouTube's page data, date-range logic, typed dates, timeline, calendar, stats and standouts |
 | `background.js` | Toolbar button and shortcut |
 | `icons/` | Toolbar and store icons. `icon.svg` is the source for the 48 and 128 px PNGs; `icon-16.svg` and `icon-32.svg` are pixel-aligned versions for the small sizes |
+| `site/` | The website, [channel-almanac.vercel.app](https://channel-almanac.vercel.app) (Astro). It runs `lib.js` for its live demo; see `site/README.md` |
 | `test/` | Unit tests for `lib.js` |
 
 Run the tests with Node 18 or newer (no dependencies to install):
