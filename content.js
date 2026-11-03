@@ -708,11 +708,15 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
   }
 
   // ---------- like counts ----------
-  // The uploads list has views but not likes, so "Most liked" looks up each upload in view:
-  // YouTube's own like button, trimmed to about 3 KB with a field mask. Each answer takes YouTube
-  // about 0.7 s, so eight run at once (about 11 a second), most viewed first so the top of the list
-  // settles within seconds. They pause with the exact dates when YouTube asks to slow down. Counts are saved.
-  const LIKE_WORKERS = 8, LIKE_GAP = 50;
+  // The uploads list has views but not likes, so "Most liked" looks them up one upload at a time:
+  // YouTube's own like button, trimmed to about 3 KB with a field mask, signed out like every request.
+  // Staying well clear of YouTube's limits matters more than speed, so:
+  //  - only the uploads the list can show get looked up (the page on screen and the next one),
+  //    most viewed first: likes track views, so the top of the list is right within seconds;
+  //  - at most 10 requests a second and 12 at once (YouTube answers in about 0.7 s);
+  //  - if YouTube pushes back (429, 403 or a captcha page instead of JSON), likes stop for 10 minutes
+  //    and resume at half the rate. Counts are saved, so each upload is looked up once.
+  const LIKE_MAX = 12, LIKE_GAP = 100, LIKE_BACKOFF = 10 * 60 * 1000;
 
   const LIKE_MASKS = [
     'contents.twoColumnWatchNextResults.results.results.contents.videoPrimaryInfoRenderer.videoActions.menuRenderer.topLevelButtons.segmentedLikeDislikeButtonViewModel.likeButtonViewModel',
@@ -727,31 +731,46 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
     return -1; // the channel hides its like counts
   }
 
-  const likeQ = { workers: 0, busy: new Set(), nextAt: 0 };
+  const likeQ = { workers: 0, busy: new Set(), nextAt: 0, gap: LIKE_GAP, pausedUntil: 0 };
   const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  // How many rows of the list want a like count: the ones shown and one more page.
+  const likeScope = () => S.shown + PAGE;
+
+  // YouTube pushing back, as opposed to a one-off failure: a 429, a 403, or a captcha page that isn't JSON.
+  const pushback = e => !!e && (e.code === 'rate' || (e.code === 'http' && e.status === 403) || e instanceof SyntaxError);
 
   function loadLikes() {
     const entry = S.entry;
     const wanted = () => S.view === 'main' && S.entry === entry && S.filters.sort === 'likes';
     const nextRec = () => {
-      for (const i of S.current) { const r = S.videos[i]; if (r[8] == null && !likeQ.busy.has(r[0])) return r; }
+      const end = Math.min(S.current.length, likeScope());
+      for (let k = 0; k < end; k++) { const r = S.videos[S.current[k]]; if (r[8] == null && !likeQ.busy.has(r[0])) return r; }
       return null;
     };
     const worker = async () => {
       likeQ.workers++;
       try {
         while (wanted()) {
-          const wait = Math.max(Q.pausedUntil, likeQ.nextAt) - Date.now();
+          const wait = Math.max(Q.pausedUntil, likeQ.pausedUntil, likeQ.nextAt) - Date.now();
           if (wait > 0) { await sleep(wait); continue; }
           const rec = nextRec();
           if (!rec) break;
-          likeQ.nextAt = Date.now() + LIKE_GAP;
+          likeQ.nextAt = Date.now() + likeQ.gap;
           likeQ.busy.add(rec[0]);
           try {
             rec[8] = await lookupLikes(rec[0]);
           } catch (e) {
-            if (e && e.code === 'rate') Q.pausedUntil = Date.now() + 60000; // retried after the pause
-            else rec[8] = -2;
+            if (pushback(e)) {
+              // Back right off: no likes for 10 minutes, then half the rate. Dates pause for a minute.
+              // Lookups already in flight get the same answer; they count as one push back, not several.
+              if (likeQ.pausedUntil <= Date.now()) likeQ.gap = Math.min(likeQ.gap * 2, 2000);
+              likeQ.pausedUntil = Date.now() + LIKE_BACKOFF;
+              Q.pausedUntil = Math.max(Q.pausedUntil, Date.now() + 60000);
+              scheduleRefresh();
+            } else {
+              rec[8] = -2; // a one-off failure: skip it this visit
+            }
           } finally {
             likeQ.busy.delete(rec[0]);
           }
@@ -763,7 +782,7 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
         likeQ.workers--;
       }
     };
-    while (likeQ.workers < LIKE_WORKERS && wanted() && nextRec()) worker();
+    while (likeQ.workers < LIKE_MAX && wanted() && nextRec()) worker();
   }
 
   // ---------- saving ----------
@@ -1267,11 +1286,15 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
     if (animate) { restartAnim($('#rTitle'), 'swap'); }
     pk.classList.toggle('fade', pk.scrollWidth > pk.clientWidth + 2 && pk.scrollLeft + pk.clientWidth < pk.scrollWidth - 2);
     // Sorting by likes shows how many counts are still loading; otherwise the line is about exact dates.
+    // Only the rows shown and the next page get like counts (see loadLikes); "Show more" extends that.
     let likesLeft = 0;
-    if (f.sort === 'likes') for (const i of idx) if (S.videos[i][8] == null) likesLeft++;
+    const inScope = Math.min(n, likeScope());
+    if (f.sort === 'likes') for (let k = 0; k < inScope; k++) if (S.videos[idx[k]][8] == null) likesLeft++;
     const pend = $('#rPending');
     pend.hidden = !pending && !likesLeft;
-    pend.lastChild.textContent = likesLeft ? `Loading likes: ${C.fmtCount(n - likesLeft)} of ${C.fmtCount(n)}` : 'Checking exact dates';
+    pend.lastChild.textContent = !likesLeft ? 'Checking exact dates'
+      : likeQ.pausedUntil > Date.now() ? `YouTube asked to slow down. Likes resume at ${C.fmtTime(likeQ.pausedUntil)}`
+      : `Loading likes: ${C.fmtCount(inScope - likesLeft)} of ${C.fmtCount(inScope)}`;
 
     renderHist(vw);
     renderStats(idx, vw, f);
@@ -2157,10 +2180,11 @@ button:hover { background: rgba(0,0,0,.1); }
 button:focus-visible { outline: 2px solid #3ea6ff; outline-offset: 2px; }
 svg { width: 18px; height: 18px; fill: currentColor; }`;
 
-  function makeChip() {
+  // kind 'likes': a fourth sort next to Latest / Popular / Oldest. kind 'dates': the panel's own chip.
+  function makeChip(kind) {
     const wrap = document.createElement('div');
     wrap.className = 'ytChipBarViewModelChipWrapper';
-    wrap.setAttribute('data-cdf-chip', '');
+    wrap.setAttribute('data-cdf-chip', kind);
     wrap.setAttribute('data-theme', theme());
     const sr = wrap.attachShadow({ mode: 'open' });
     const st = document.createElement('style');
@@ -2168,14 +2192,30 @@ svg { width: 18px; height: 18px; fill: currentColor; }`;
     sr.appendChild(st);
     const b = document.createElement('button');
     b.type = 'button';
-    b.title = withKey('Filter this channel’s uploads by date');
-    setHTML(b, `${ICON.cal}<span>Dates</span>`);
-    b.addEventListener('click', e => { e.stopPropagation(); if (S.open) closeDrawer(); else openDrawer(); });
+    if (kind === 'likes') {
+      b.title = 'This channel’s uploads sorted by likes';
+      setHTML(b, '<span>Most liked</span>');
+      b.addEventListener('click', e => { e.stopPropagation(); showMostLiked(); });
+    } else {
+      b.title = withKey('Filter this channel’s uploads by date');
+      setHTML(b, `${ICON.cal}<span>Dates</span>`);
+      b.addEventListener('click', e => { e.stopPropagation(); if (S.open) closeDrawer(); else openDrawer(); });
+    }
     sr.appendChild(b);
     return wrap;
   }
 
-  // Channel tabs with YouTube's Latest / Popular / Oldest row get the Dates chip in that row.
+  // The Most liked chip: the whole channel by likes, in the tab's own type, like YouTube's Popular.
+  // A second click closes the panel, as the Dates chip does.
+  function showMostLiked() {
+    const type = { videos: 'videos', shorts: 'shorts', streams: 'live' }[S.ref && S.ref.tab] || 'all';
+    const f = S.filters;
+    if (S.open && S.view === 'main' && f.sort === 'likes' && !f.from && !f.to && !f.otd && (f.type || 'all') === type) { closeDrawer(); return; }
+    S.pendingHash = { from: '', to: '', otd: false, sort: 'likes', type };
+    if (S.open) load(); else openDrawer();
+  }
+
+  // Channel tabs with YouTube's Latest / Popular / Oldest row get the Most liked and Dates chips in that row.
   // Every other channel page (Home, Playlists, Posts…) gets the side tab straight away.
   const CHIP_TABS = ['videos', 'shorts', 'streams'];
   const chipTab = () => !!(S.ref && S.ref.channelPage && CHIP_TABS.includes(S.ref.tab));
@@ -2186,7 +2226,7 @@ svg { width: 18px; height: 18px; fill: currentColor; }`;
       document.querySelectorAll('ytd-rich-grid-renderer chip-bar-view-model, ytd-rich-grid-renderer yt-chip-cloud-renderer').forEach(bar => {
         const scroller = bar.querySelector('.ytChipBarViewModelChipBarScrollContainer, #chips') || bar;
         if (!scroller.getBoundingClientRect().width) return; // a cached, hidden page
-        if (!bar.querySelector('[data-cdf-chip]')) scroller.appendChild(makeChip());
+        if (!bar.querySelector('[data-cdf-chip]')) scroller.append(makeChip('likes'), makeChip('dates'));
         shown = true;
       });
     }
@@ -2404,7 +2444,7 @@ button:focus-visible { outline: 2px solid #3ea6ff; outline-offset: 2px; }`;
     if (launch) launch.title = withKey('Browse uploads by date');
     const fine = $('#fineKeys');
     if (fine) fine.textContent = `Drag across days or years to pick a range.${shortcut ? ` ${shortcut} opens the panel anywhere on YouTube.` : ''}`;
-    document.querySelectorAll('[data-cdf-chip]').forEach(w => { const b = w.shadowRoot && w.shadowRoot.querySelector('button'); if (b) b.title = withKey('Filter this channel’s uploads by date'); });
+    document.querySelectorAll('[data-cdf-chip="dates"]').forEach(w => { const b = w.shadowRoot && w.shadowRoot.querySelector('button'); if (b) b.title = withKey('Filter this channel’s uploads by date'); });
   }
   showShortcut();
   try {

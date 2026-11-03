@@ -35,7 +35,7 @@ export const features: Feature[] = [
   { slug: 'milestones', name: 'First upload and milestones', line: 'Jump to the first public upload. The 100th, 500th and 1,000th, and the most viewed, are marked on the timeline.' },
   { slug: 'dead-end', name: 'Never a dead end', line: 'When a range is empty, the closest uploads before and after are one click away.' },
   { slug: 'standouts', name: 'Standouts', line: 'Uploads that beat the channel’s usual views for their period get a tag, like “4.2× usual”.' },
-  { slug: 'likes', name: 'Most liked', line: 'Sort any range by likes. Counts load as you sort and are saved, so each is fetched once.' },
+  { slug: 'likes', name: 'Most liked', line: 'A fourth sort next to Latest, Popular and Oldest. Counts load for the uploads on screen, most viewed first, and are saved.' },
   { slug: 'play', name: 'Play in order', line: 'Play the whole view oldest first. When YouTube’s 50‑video playlist cap is reached, the next 50 start on their own.' },
   { slug: 'hover', name: 'Exact dates on hover', line: 'Point at any “3 years ago” anywhere on YouTube to read the exact date and time.' },
 ];
@@ -108,7 +108,7 @@ export const guide: Chapter[] = [
       { id: 'types', name: 'Videos, Shorts, Live', text: 'Exact, read from the channel’s own Shorts and Live tabs.' },
       { id: 'search', name: 'Search and length', key: '/', text: 'Several words must all match; put a minus in front of a word to leave it out. Length buckets match YouTube’s own search filter.' },
       { id: 'standouts', name: 'Standouts', text: 'Uploads that beat the channel’s usual views for their period are tagged, for example “4.2× usual”, and the Standouts sort puts them first.' },
-      { id: 'likes', name: 'Most liked', text: 'Sorts the current view by likes. YouTube’s uploads list has no like counts, so they load when you pick this sort, most viewed first, and the list re-sorts as they arrive. The top of the list is usually right within a few seconds. Uploads whose channel hides likes go last.' },
+      { id: 'likes', name: 'Most liked', text: 'Sorts by likes: pick it in the Sort menu, or click the Most liked chip next to Latest, Popular and Oldest to see the whole channel by likes. YouTube’s uploads list has no like counts, so they load for the uploads on screen and the next page, most viewed first. The top of the list is usually right within a few seconds, and Show more loads more. Uploads whose channel hides likes go last.' },
       { id: 'stats', name: 'Stats for the range', text: 'Uploads per month, the longest gap, the usual upload day and time, and median views.' },
     ],
   },

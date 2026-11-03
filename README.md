@@ -41,6 +41,7 @@ Temporary add-ons are removed when Firefox restarts.
 ## Open it
 
 - The **Dates** chip next to Latest / Popular / Oldest on a channel's Videos, Shorts or Live tab
+- The **Most liked** chip just before it, which opens the panel on the whole channel sorted by likes
 - The **Dates** tab on the right edge on every other channel page (Home, Playlists, Posts…)
 - The calendar button right after Share on a video (same round style as YouTube's own buttons), which opens the panel on the week around that video
 - The toolbar button or **Alt+Shift+D** (**⌥⇧D** on a Mac) anywhere on YouTube (on a video, it opens that video's channel around that video). You can change it in your browser's extension shortcut settings, e.g. `chrome://extensions/shortcuts`
@@ -59,7 +60,7 @@ Temporary add-ons are removed when Firefox restarts.
 - **Videos / Shorts / Live.** Exact, read from the channel's own Shorts and Live tabs.
 - **Search and length.** Several words must all match; put `-` in front of a word to exclude it.
 - **Standouts.** Uploads that beat the channel's usual views for their period are tagged (e.g. "4.2× usual"), and the Standouts sort puts them first.
-- **Most liked.** Sorts the current view by likes. YouTube's uploads list has no like counts, so they load when you pick this sort, most viewed first, and the list re-sorts as they arrive. The top of the list is usually right within a few seconds. Uploads whose channel hides likes go last.
+- **Most liked.** Sorts by likes: pick it in the Sort menu, or click the Most liked chip next to Latest / Popular / Oldest to see the whole channel (in that tab's type) by likes. YouTube's uploads list has no like counts, so they load for the uploads on screen and the next page, most viewed first: the top of the list is usually right within a few seconds, and Show more loads more. Uploads whose channel hides likes go last.
 - **Stats for the range.** Uploads per month, longest gap, usual upload day and time, median views.
 - **Play in order.** Plays everything in the current view oldest first as a YouTube playlist. YouTube caps these at 50 videos, so the extension starts the next 50 automatically; a small pill shows your place and has Next / Stop.
 - **Copy link.** Copies a link to the channel with your filters in it (`…/videos#cdf=2019-03-01..2019-03-31&type=shorts`). Opening it opens the panel with that exact view.
@@ -108,7 +109,7 @@ Temporary add-ons are removed when Firefox restarts.
 
 - At most 3 exact-date lookups at once with gaps between them; calendar and background lookups go one at a time, under two a second.
 - Typical use: opening a 1,000-video channel is about 10–15 list requests, a date range about 15–30 lookups. Reopening a saved channel is 1–3 requests.
-- Like counts load only while you sort by Most liked: one small request per upload in view (about 3 KB, trimmed to just the like button), eight at a time, about 10 a second. They're saved, so each is fetched once.
+- Like counts load only while you sort by Most liked, and only for the uploads on screen and the next page: one small request each (about 3 KB, trimmed to just the like button), at most 10 a second and 12 at once. If YouTube asks it to slow down, likes stop for 10 minutes and come back at half the rate. Counts are saved, so each is fetched once.
 - If YouTube asks it to slow down, it pauses for a minute and resumes on its own.
 
 Channels you've opened before load instantly and only new uploads are fetched. Milestones add a handful of lookups per channel.
