@@ -111,7 +111,7 @@ HOME
   | full width: whole history grid, a row per year, range highlighted     |
 
 4 Feature index, index list        paper
-  | name                one line                    key |  x 8 rows
+  | name                one line                    key |  x 9 rows
 
 5 How it works, data/facts         ink
   | 100 / per request | ~20 / lookups decide | 3 / at once | 1 to 3 / to reopen |
