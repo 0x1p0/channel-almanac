@@ -2,6 +2,7 @@
 
 # Channel Almanac
 
+[![Test](https://github.com/0x1p0/channel-almanac/actions/workflows/test.yml/badge.svg)](https://github.com/0x1p0/channel-almanac/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A free, open-source browser extension that lets you find anything a YouTube channel ever uploaded by its exact date, right on YouTube. No API key, no account, no outside server.
@@ -127,12 +128,15 @@ There's no build step: the files in this folder are the extension.
 | `icons/` | Toolbar and store icons. `icon.svg` is the source for the 48 and 128 px PNGs; `icon-16.svg` and `icon-32.svg` are pixel-aligned versions for the small sizes |
 | `site/` | The website, [channel-almanac.vercel.app](https://channel-almanac.vercel.app) (Astro). It runs `lib.js` for its live demo; see `site/README.md` |
 | `test/` | Unit tests for `lib.js` |
+| `.github/workflows/` | The test check GitHub runs on every push and pull request |
 
 Run the tests with Node 18 or newer (no dependencies to install):
 
 ```bash
 node --test
 ```
+
+GitHub Actions runs the same tests on every push and pull request, along with a syntax check of the extension's scripts and a check that `manifest.json` parses (`.github/workflows/test.yml`).
 
 After editing, reload the extension (see **Updating** above) and refresh the YouTube tab.
 
@@ -146,7 +150,7 @@ zip -r channel-almanac.zip manifest.json background.js content.js lib.js icons L
 
 Bug reports and pull requests are welcome. YouTube changes its page data from time to time, so if something stops working, please open an issue with the channel URL, your browser and what you expected to see.
 
-For pull requests, keep the extension dependency-free, add a test in `test/` for changes to `lib.js`, and run `node --test` before sending.
+For pull requests, keep the extension dependency-free, add a test in `test/` for changes to `lib.js`, and run `node --test` before sending. The same checks run on your pull request automatically.
 
 ## Disclaimer
 
