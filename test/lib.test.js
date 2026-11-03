@@ -187,12 +187,12 @@ test('likesFrom reads the like button in a watch-page response', () => {
   assert.equal(C.likesFrom({}), null);
 });
 
-test('Most liked sorts by like count, unknown and hidden counts last', () => {
-  const v = (id, likes) => [id, id, 60, 10, '', 0, 0, ''].concat(likes === undefined ? [] : [likes]);
-  const videos = [v('a', 5), v('b'), v('c', 900), v('d', -1), v('e', 40), v('f', null)];
+test('Most liked sorts by like count, then uploads without a count by views', () => {
+  const v = (id, views, likes) => [id, id, 60, views, '', 0, 0, ''].concat(likes === undefined ? [] : [likes]);
+  const videos = [v('a', 10, 5), v('b', 10), v('c', 10, 900), v('d', 70, -1), v('e', 10, 40), v('f', 300, null), v('g', 10)];
   const vw = C.view(videos);
   const f = { from: '', to: '', q: '', len: 'any', sort: 'likes', type: 'all', otd: false };
-  assert.deepEqual(C.select(videos, f, vw).idx, [2, 4, 0, 1, 3, 5]);
+  assert.deepEqual(C.select(videos, f, vw).idx, [2, 4, 0, 5, 3, 1, 6]);
   assert.equal(C.decodeFilters('#cdf=..&sort=likes').sort, 'likes');
   assert.equal(C.fmtLikes(1234), '1.2K likes');
   assert.equal(C.fmtLikes(1), '1 like');

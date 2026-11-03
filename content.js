@@ -709,8 +709,10 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
 
   // ---------- like counts ----------
   // The uploads list has views but not likes, so "Most liked" looks up each upload in view:
-  // YouTube's own like button, trimmed to about 3 KB with a field mask. Two at a time, paced like
-  // the exact dates and paused with them when YouTube asks to slow down. Counts are saved.
+  // YouTube's own like button, trimmed to about 3 KB with a field mask. Each answer takes YouTube
+  // about 0.7 s, so eight run at once (about 11 a second), most viewed first so the top of the list
+  // settles within seconds. They pause with the exact dates when YouTube asks to slow down. Counts are saved.
+  const LIKE_WORKERS = 8, LIKE_GAP = 50;
 
   const LIKE_MASKS = [
     'contents.twoColumnWatchNextResults.results.results.contents.videoPrimaryInfoRenderer.videoActions.menuRenderer.topLevelButtons.segmentedLikeDislikeButtonViewModel.likeButtonViewModel',
@@ -743,7 +745,7 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
           if (wait > 0) { await sleep(wait); continue; }
           const rec = nextRec();
           if (!rec) break;
-          likeQ.nextAt = Date.now() + GAP_HIGH;
+          likeQ.nextAt = Date.now() + LIKE_GAP;
           likeQ.busy.add(rec[0]);
           try {
             rec[8] = await lookupLikes(rec[0]);
@@ -761,7 +763,7 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
         likeQ.workers--;
       }
     };
-    while (likeQ.workers < 2 && wanted() && nextRec()) worker();
+    while (likeQ.workers < LIKE_WORKERS && wanted() && nextRec()) worker();
   }
 
   // ---------- saving ----------

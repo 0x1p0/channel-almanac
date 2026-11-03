@@ -436,7 +436,9 @@ var CDF = (() => {
     if (f.sort === 'old') idx.reverse();
     else if (f.sort === 'views') idx.sort((a, b) => videos[b][3] - videos[a][3] || a - b);
     else if (f.sort === 'standout' && scores) idx.sort((a, b) => scores[b] - scores[a] || a - b);
-    else if (f.sort === 'likes') idx.sort((a, b) => likesOf(videos[b]) - likesOf(videos[a]) || a - b);
+    // Uploads without a like count yet follow in view order: likes track views, so that's the best guess
+    // until their counts arrive (and the order the content script looks them up in).
+    else if (f.sort === 'likes') idx.sort((a, b) => likesOf(videos[b]) - likesOf(videos[a]) || videos[b][3] - videos[a][3] || a - b);
     return { idx, pending };
   }
 

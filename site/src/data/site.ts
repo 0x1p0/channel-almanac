@@ -43,7 +43,7 @@ export const features: Feature[] = [
 export const facts = [
   { n: '100', unit: 'uploads per request', text: 'The uploads list comes from YouTube’s own page data. A 1,000‑video channel opens in 10 to 15 requests.' },
   { n: '≈20', unit: 'lookups', text: 'Uploads are in date order, so only the ones at the edges of a range need an exact date. That decides every upload in or out, even on big channels.' },
-  { n: '3', unit: 'at once, at most', text: 'Lookups leave gaps between them; background ones go one at a time, under two a second. Asked to slow down, it pauses for a minute.' },
+  { n: '3', unit: 'at once, at most', text: 'Exact-date lookups leave gaps between them; background ones go one at a time, under two a second. Asked to slow down, it pauses for a minute.' },
   { n: '1 to 3', unit: 'requests to reopen', text: 'Channels you opened before load from your browser’s storage. Only new uploads are fetched.' },
 ];
 
@@ -108,7 +108,7 @@ export const guide: Chapter[] = [
       { id: 'types', name: 'Videos, Shorts, Live', text: 'Exact, read from the channel’s own Shorts and Live tabs.' },
       { id: 'search', name: 'Search and length', key: '/', text: 'Several words must all match; put a minus in front of a word to leave it out. Length buckets match YouTube’s own search filter.' },
       { id: 'standouts', name: 'Standouts', text: 'Uploads that beat the channel’s usual views for their period are tagged, for example “4.2× usual”, and the Standouts sort puts them first.' },
-      { id: 'likes', name: 'Most liked', text: 'Sorts the current view by likes. YouTube’s uploads list has no like counts, so they load when you pick this sort, a couple at a time, and the list re-sorts as they arrive. Uploads whose channel hides likes go last.' },
+      { id: 'likes', name: 'Most liked', text: 'Sorts the current view by likes. YouTube’s uploads list has no like counts, so they load when you pick this sort, most viewed first, and the list re-sorts as they arrive. The top of the list is usually right within a few seconds. Uploads whose channel hides likes go last.' },
       { id: 'stats', name: 'Stats for the range', text: 'Uploads per month, the longest gap, the usual upload day and time, and median views.' },
     ],
   },
