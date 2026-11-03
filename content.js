@@ -707,6 +707,63 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
     if (!on && has) rec[7] = rec[7].replace(f, '');
   }
 
+  // ---------- like counts ----------
+  // The uploads list has views but not likes, so "Most liked" looks up each upload in view:
+  // YouTube's own like button, trimmed to about 3 KB with a field mask. Two at a time, paced like
+  // the exact dates and paused with them when YouTube asks to slow down. Counts are saved.
+
+  const LIKE_MASKS = [
+    'contents.twoColumnWatchNextResults.results.results.contents.videoPrimaryInfoRenderer.videoActions.menuRenderer.topLevelButtons.segmentedLikeDislikeButtonViewModel.likeButtonViewModel',
+    'contents.twoColumnWatchNextResults.results.results.contents.videoPrimaryInfoRenderer'
+  ];
+
+  async function lookupLikes(id) {
+    for (const mask of LIKE_MASKS) {
+      const n = C.likesFrom(await YT.call('next', { videoId: id }, mask));
+      if (n !== null) return n;
+    }
+    return -1; // the channel hides its like counts
+  }
+
+  const likeQ = { workers: 0, busy: new Set(), nextAt: 0 };
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  function loadLikes() {
+    const entry = S.entry;
+    const wanted = () => S.view === 'main' && S.entry === entry && S.filters.sort === 'likes';
+    const nextRec = () => {
+      for (const i of S.current) { const r = S.videos[i]; if (r[8] == null && !likeQ.busy.has(r[0])) return r; }
+      return null;
+    };
+    const worker = async () => {
+      likeQ.workers++;
+      try {
+        while (wanted()) {
+          const wait = Math.max(Q.pausedUntil, likeQ.nextAt) - Date.now();
+          if (wait > 0) { await sleep(wait); continue; }
+          const rec = nextRec();
+          if (!rec) break;
+          likeQ.nextAt = Date.now() + GAP_HIGH;
+          likeQ.busy.add(rec[0]);
+          try {
+            rec[8] = await lookupLikes(rec[0]);
+          } catch (e) {
+            if (e && e.code === 'rate') Q.pausedUntil = Date.now() + 60000; // retried after the pause
+            else rec[8] = -2;
+          } finally {
+            likeQ.busy.delete(rec[0]);
+          }
+          markDirty(entry);
+          S.regroup = true; // re-render the list: its order changes as counts arrive
+          scheduleRefresh();
+        }
+      } finally {
+        likeQ.workers--;
+      }
+    };
+    while (likeQ.workers < 2 && wanted() && nextRec()) worker();
+  }
+
   // ---------- saving ----------
 
   const dirty = new Set();
@@ -736,7 +793,14 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
 
   async function writeEntry(entry) {
     if (discarded.has(entry)) return;
-    const videos = entry.videos.map(r => (r[6] === -1 ? r.slice(0, 6).concat(0, r[7]) : r));
+    // Failed lookups are saved as "not looked up yet", so the next visit tries them again.
+    const videos = entry.videos.map(r => {
+      if (r[6] !== -1 && r[8] !== -2) return r;
+      const c = r.slice();
+      if (c[6] === -1) c[6] = 0;
+      if (c[8] === -2) c[8] = null;
+      return c;
+    });
     const idx = (await storageGet('idx')) || {};
     idx[entry.channel.id] = { title: entry.channel.title, count: videos.length, syncedAt: entry.syncedAt };
     await storageSet({ ['up:' + entry.channel.id]: { channel: entry.channel, syncedAt: entry.syncedAt, typed: entry.typed ? TYPES_VERSION : 0, videos }, idx });
@@ -1064,7 +1128,7 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
         <div class="search">${ICON.search}<input type="search" id="q" placeholder="Search titles" autocomplete="off" spellcheck="false" aria-label="Search titles" title="Every word must match. Put - in front of a word to leave it out."></div>
         <div class="toolbar">
           <label class="sel" title="Length"><select id="len" aria-label="Length">${C.LENGTHS.map(([v, l]) => `<option value="${v}">${v === 'any' ? 'Length' : l}</option>`).join('')}</select>${ICON.chev}</label>
-          <label class="sel" title="Sort"><select id="sort" aria-label="Sort"><option value="new">Newest first</option><option value="old">Oldest first</option><option value="views">Most viewed</option><option value="standout">Standouts</option></select>${ICON.chev}</label>
+          <label class="sel" title="Sort"><select id="sort" aria-label="Sort"><option value="new">Newest first</option><option value="old">Oldest first</option><option value="views">Most viewed</option><option value="likes">Most liked</option><option value="standout">Standouts</option></select>${ICON.chev}</label>
           <span class="grow"></span>
           <span class="copied" id="copied" hidden>Link copied</span>
           <button class="icon sm" data-act="viewToggle" id="viewBtn" aria-pressed="${opts.view === 'grid'}" title="Grid view (G)" aria-label="Grid view">${ICON.grid}</button>
@@ -1119,11 +1183,13 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
     const score = S.scores[i] || 0;
     const so = score >= 2 ? `<span class="so" title="${score.toFixed(1)} times the views of this channel's nearby uploads">${score >= 10 ? Math.round(score) : score.toFixed(1)}× usual</span>` : '';
     const href = f.includes('S') ? `/shorts/${id}` : `/watch?v=${id}`;
+    // Views and, once looked up, likes (live and upcoming rows have no view count but can have likes).
+    const counts = [C.fmtViews(views), C.fmtLikes(C.likesOf(rec))].filter(Boolean).join(' · ');
     const hl = hlFor(id);
     const seen = !hl && opts.marks && opened.has(id);
     return `<a class="row${hl ? ' hl' : ''}${seen ? ' seen' : ''}" href="${href}" data-id="${id}"${exact ? '' : ' data-pending="1"'}>
       <span class="thumb"><img loading="lazy" decoding="async" alt="" src="https://i.ytimg.com/vi/${id}/mqdefault.jpg">${badge}${seen ? '<span class="seen-tag">Opened</span>' : ''}</span>
-      <span class="info">${hl ? `<span class="hl-tag">${esc(hl)}</span>` : ''}<span class="title">${esc(title)}</span><span class="when${exact ? '' : ' approx'}"${exact ? '' : ' title="Exact date is loading"'}>${esc(whenText(rec))}</span>${views >= 0 ? `<span class="views">${C.fmtViews(views)}${so}</span>` : ''}</span>
+      <span class="info">${hl ? `<span class="hl-tag">${esc(hl)}</span>` : ''}<span class="title">${esc(title)}</span><span class="when${exact ? '' : ' approx'}"${exact ? '' : ' title="Exact date is loading"'}>${esc(whenText(rec))}</span>${counts ? `<span class="views">${counts}${so}</span>` : ''}</span>
     </a>`;
   }
 
@@ -1198,7 +1264,12 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
     S.lastCount = n;
     if (animate) { restartAnim($('#rTitle'), 'swap'); }
     pk.classList.toggle('fade', pk.scrollWidth > pk.clientWidth + 2 && pk.scrollLeft + pk.clientWidth < pk.scrollWidth - 2);
-    $('#rPending').hidden = !pending;
+    // Sorting by likes shows how many counts are still loading; otherwise the line is about exact dates.
+    let likesLeft = 0;
+    if (f.sort === 'likes') for (const i of idx) if (S.videos[i][8] == null) likesLeft++;
+    const pend = $('#rPending');
+    pend.hidden = !pending && !likesLeft;
+    pend.lastChild.textContent = likesLeft ? `Loading likes: ${C.fmtCount(n - likesLeft)} of ${C.fmtCount(n)}` : 'Checking exact dates';
 
     renderHist(vw);
     renderStats(idx, vw, f);
@@ -1234,6 +1305,7 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
       const row = list.querySelector('.row.hl');
       if (row) requestAnimationFrame(() => row.scrollIntoView({ block: 'center', behavior: reduceMotion() ? 'auto' : 'smooth' }));
     }
+    if (likesLeft) loadLikes();
   }
 
   function restartAnim(el, cls) {
@@ -1265,7 +1337,7 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px
     viewTimer = setTimeout(() => storageSet({ ['v:' + id]: f }), 800);
   }
 
-  // Results under month headings when sorted by date; a flat list for views and standouts.
+  // Results under month headings when sorted by date; a flat list for views, likes and standouts.
   function listHTML(rows, all, vw) {
     const grouped = S.filters.sort === 'new' || S.filters.sort === 'old';
     if (!grouped) return rows.map(rowHTML).join('');

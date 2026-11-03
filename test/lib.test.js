@@ -177,3 +177,24 @@ test('relBounds reads YouTube’s long and short relative labels', () => {
   assert.deepEqual(C.relBounds('5m ago', at), [-Infinity, Infinity]);
   assert.deepEqual(C.relBounds('5 ago', at), [-Infinity, Infinity]);
 });
+
+test('likesFrom reads the like button in a watch-page response', () => {
+  // The shape YouTube returns for the "next" endpoint with a field mask on the like button.
+  const button = text => ({ contents: { twoColumnWatchNextResults: { results: { results: { contents: [{ videoPrimaryInfoRenderer: { videoActions: { menuRenderer: { topLevelButtons: [{ segmentedLikeDislikeButtonViewModel: { likeButtonViewModel: { likeButtonViewModel: { toggleButtonViewModel: { toggleButtonViewModel: { defaultButtonViewModel: { buttonViewModel: { title: '11K', accessibilityText: text } } } } } } } }] } } } }] } } } } });
+  assert.equal(C.likesFrom(button('like this video along with 11,671 other people')), 11671);
+  assert.equal(C.likesFrom(button('like this video along with 1 other person')), 1);
+  assert.equal(C.likesFrom(button('I like this')), null); // likes hidden by the channel
+  assert.equal(C.likesFrom({}), null);
+});
+
+test('Most liked sorts by like count, unknown and hidden counts last', () => {
+  const v = (id, likes) => [id, id, 60, 10, '', 0, 0, ''].concat(likes === undefined ? [] : [likes]);
+  const videos = [v('a', 5), v('b'), v('c', 900), v('d', -1), v('e', 40), v('f', null)];
+  const vw = C.view(videos);
+  const f = { from: '', to: '', q: '', len: 'any', sort: 'likes', type: 'all', otd: false };
+  assert.deepEqual(C.select(videos, f, vw).idx, [2, 4, 0, 1, 3, 5]);
+  assert.equal(C.decodeFilters('#cdf=..&sort=likes').sort, 'likes');
+  assert.equal(C.fmtLikes(1234), '1.2K likes');
+  assert.equal(C.fmtLikes(1), '1 like');
+  assert.equal(C.fmtLikes(-1), '');
+});

@@ -1,8 +1,9 @@
 // Channel Almanac — pure helpers shared by the content script (and tests).
 //
 // A video record is an array:
-//   [0 id, 1 title, 2 durationSec, 3 views, 4 relativeText, 5 seenAtMs, 6 exactMs, 7 flags]
+//   [0 id, 1 title, 2 durationSec, 3 views, 4 relativeText, 5 seenAtMs, 6 exactMs, 7 flags, 8 likes]
 // exactMs: >0 exact publish time, 0 unknown, -1 lookup failed (memory only)
+// likes:   >=0 like count, null/absent not looked up, -1 hidden by the channel, -2 lookup failed (memory only)
 // flags:   'L' live now, 'U' upcoming, 'D' exact date has no time-of-day
 // Lists are kept in YouTube's uploads order: newest first.
 
@@ -435,7 +436,26 @@ var CDF = (() => {
     if (f.sort === 'old') idx.reverse();
     else if (f.sort === 'views') idx.sort((a, b) => videos[b][3] - videos[a][3] || a - b);
     else if (f.sort === 'standout' && scores) idx.sort((a, b) => scores[b] - scores[a] || a - b);
+    else if (f.sort === 'likes') idx.sort((a, b) => likesOf(videos[b]) - likesOf(videos[a]) || a - b);
     return { idx, pending };
+  }
+
+  // The known like count, or -1 when there's none to show (unknown, hidden or failed). Not `v[8] >= 0`:
+  // a saved record holds null for "not looked up", and null >= 0 is true.
+  const likesOf = v => (typeof v[8] === 'number' && v[8] >= 0 ? v[8] : -1);
+
+  // The like count from a watch-page ("next") response. YouTube's like button says
+  // "like this video along with 11,671 other people"; it has no number when likes are hidden.
+  function likesFrom(json) {
+    let n = null;
+    walk(json, node => {
+      for (const v of Object.values(node)) {
+        const m = typeof v === 'string' && /along with ([\d,.]+) other (?:people|person)\b/i.exec(v);
+        if (m) { n = parseInt(m[1].replace(/[.,]/g, ''), 10); return false; }
+      }
+      return n === null;
+    });
+    return n;
   }
 
   // Which videos to look up next so the range edges become exact: a few evenly spaced
@@ -661,7 +681,7 @@ var CDF = (() => {
     const type = p.get('type'), len = p.get('len'), sort = p.get('sort');
     if (TYPES.some(t => t[0] === type)) f.type = type;
     if (LENGTHS.some(l => l[0] === len)) f.len = len;
-    if (['new', 'old', 'views', 'standout'].includes(sort)) f.sort = sort;
+    if (['new', 'old', 'views', 'likes', 'standout'].includes(sort)) f.sort = sort;
     if (p.get('q')) f.q = p.get('q');
     return f;
   }
@@ -995,6 +1015,7 @@ var CDF = (() => {
 
   const compact = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 });
   const fmtViews = n => (n < 0 ? '' : `${compact.format(n)} view${n === 1 ? '' : 's'}`);
+  const fmtLikes = n => (n < 0 ? '' : `${compact.format(n)} like${n === 1 ? '' : 's'}`);
   const fmtCount = n => n.toLocaleString();
 
   const dateFmt = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
@@ -1026,11 +1047,11 @@ var CDF = (() => {
 
   return {
     DAY, pageRef, refKey, walk, textOf, extractVideos, extractIds, findContinuation, findCount, findOwner,
-    parseDateStr, videoFromPlayer, videoFromNext, videoFromHtml, parseDur, parseViews,
+    parseDateStr, videoFromPlayer, videoFromNext, videoFromHtml, parseDur, parseViews, likesFrom, likesOf,
     relBounds, view, rangesFor, status, select, probes, histogram, calendar, yearView, nearest, rangeTitle, standouts, stats,
     selectedTab, channelTabs, MONTHS, parseDateQuery, stepRange, aroundRange, milestones, history, slotDate, SLOT_START,
     encodeFilters, decodeFilters, LENGTHS, TYPES, typeOf, lenMatch, queryMatcher, presets, WEEKDAYS,
-    fmtDuration, fmtViews, fmtCount, fmtDate, fmtTime, fmtDay, rangeLabel, ago, isoDay, dayStart, dayEnd
+    fmtDuration, fmtViews, fmtLikes, fmtCount, fmtDate, fmtTime, fmtDay, rangeLabel, ago, isoDay, dayStart, dayEnd
   };
 })();
 
