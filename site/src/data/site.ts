@@ -136,16 +136,34 @@ export const problem = {
     { k: 'Vague labels', v: '“3 years ago” covers a whole year of uploads, sometimes hundreds of them.' },
     { k: 'Endless scroll', v: 'Older uploads only appear after you scroll through every newer one.' },
   ],
-  fix: 'Channel Almanac adds a fourth chip, Dates, and a panel that knows the exact day of every upload.',
+  fix: 'Channel Almanac adds Dates, a panel that knows the exact day of every upload, and a Most liked sort.',
 };
 
 export const steps = [
-  { shot: 'chip.webp', title: 'Click Dates', text: 'It sits next to Latest, Popular and Oldest on any channel’s Videos, Shorts or Live tab.', alt: 'YouTube’s Latest, Popular and Oldest chips with the Dates chip added after them.', fit: 'chip' },
+  { shot: 'chip.webp', title: 'Click Dates', text: 'It sits after Latest, Popular and Oldest, next to Most liked, on any channel’s Videos, Shorts or Live tab.', alt: 'YouTube’s Latest, Popular and Oldest chips, with the Most liked and Dates chips added after them.', fit: 'chip' },
   { shot: 'type-panel.webp', title: 'Say when', text: 'Type “february 2021”, “summer 2019” or “first video”. The preview counts the uploads before you press Enter.', alt: 'The Channel Almanac panel on NASA’s channel with “february 2021” typed and the preview “32 uploads, press Enter”.', fit: 'top' },
   { shot: 'range-panel.webp', title: 'Get every upload from then', text: 'Exact dates and times, ready to play in order or share as a link.', alt: 'February 2021 on NASA’s channel: 32 uploads listed with exact dates such as Sun, Feb 28, 2021, 2:43 PM.', fit: 'bottom' },
 ];
 
 export const extras = [
-  { shot: 'history-panel.webp', title: 'Whole history', text: 'All 6,197 of NASA’s uploads since 2008, a row of days per year.', alt: 'Whole history of NASA’s channel: one row of days per year from 2008 to 2026, darker where more videos went up.' },
+  { shot: 'history-panel.webp', title: 'Whole history', text: 'All 6,199 of NASA’s uploads since 2008, a row of days per year.', alt: 'Whole history of NASA’s channel: one row of days per year from 2008 to 2026, darker where more videos went up.' },
   { shot: 'hover-tip.webp', title: 'Exact dates on hover', text: 'Point at any “5y ago” on YouTube for the day and time.', alt: 'A tooltip reading Mon, Feb 22, 2021, 2:16 PM above a NASA video labelled 5y ago.' },
 ];
+
+// Most liked, on the home page: NASA's real top five by likes, read by the extension on 3 Nov 2026
+// (Videos tab, all time). Counts as the panel shows them.
+export const liked = {
+  title: 'Sort a channel by what people liked.',
+  text: 'YouTube’s Popular sorts by views. Most liked, next to it, sorts by real like counts, read from each upload’s own like button.',
+  note: 'Counts load for the uploads on screen, most viewed first, so the top is right within seconds. They’re saved, so each upload is looked up once.',
+  board: 'NASA, all time, by likes',
+  rows: [
+    { title: 'We Are Going', likes: '1.3M', views: '17M' },
+    { title: 'How We Are Going to the Moon', likes: '480K', views: '11M' },
+    { title: 'Perseverance Rover’s Descent and Touchdown on Mars', likes: '388K', views: '17M' },
+    { title: 'We Are NASA', likes: '141K', views: '3.8M' },
+    { title: 'Restored Apollo 11 Moonwalk', likes: '130K', views: '20M' },
+  ],
+  versus: { title: 'The Year of Pluto', views: '21M', rank: 15 },
+  source: 'Like counts from NASA’s public YouTube channel, read by the extension on 3 November 2026.',
+};

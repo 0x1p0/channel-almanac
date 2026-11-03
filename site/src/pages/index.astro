@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Demo from '../components/Demo.astro';
-import { site, features, facts, privacy, problem, steps, extras } from '../data/site';
+import { site, features, facts, privacy, problem, steps, extras, liked } from '../data/site';
 import { shot, media } from '../data/shots';
 import Shortcut from '../components/Shortcut.astro';
 import { exampleChannel, relativeLabel } from '../data/channel';
@@ -16,6 +16,7 @@ const pile = ch.uploads.filter((u) => relativeLabel(u.t, NOW) === label).length;
 const problemShot = await shot('problem-crop.webp');
 const stepShots = await Promise.all(steps.map((s) => shot(s.shot)));
 const extraShots = await Promise.all(extras.map((s) => shot(s.shot)));
+const chipShot = await shot('chip.webp');
 const video = media('channel-almanac-demo.mp4');
 const poster = media('channel-almanac-demo.jpg');
 ---
@@ -88,13 +89,40 @@ const poster = media('channel-almanac-demo.jpg');
         <video controls playsinline preload="none" poster={poster ?? undefined} width="1920" height="1080">
           <source src={video} type="video/mp4" />
         </video>
-        <figcaption>The demo, 42 seconds, with sound.</figcaption>
+        <figcaption>The demo, 48 seconds, with sound.</figcaption>
       </figure>
     )}
     {(problemShot || stepShots.some(Boolean)) && <p class="shots-note">Screenshots: Channel Almanac running on NASA’s public YouTube channel. Not affiliated with YouTube or NASA.</p>}
   </section>
 
   <Demo ch={ch} now={NOW} />
+
+  <section class="liked" data-tone="ink" aria-labelledby="liked-title">
+    <div class="liked__intro">
+      <p class="kicker">Most liked</p>
+      <h2 id="liked-title" class="liked__title">{liked.title}</h2>
+      <p class="liked__text">{liked.text}</p>
+      {chipShot && (
+        <img class="liked__chips" src={chipShot.src} width={chipShot.width} height={chipShot.height} loading="lazy" decoding="async" alt="YouTube’s Latest, Popular and Oldest chips, with Most liked and Dates after them." />
+      )}
+      <p class="liked__note">{liked.note}</p>
+      <a class="arrow-link" href="/guide/#likes">More in the guide <span aria-hidden="true">→</span></a>
+    </div>
+    <figure class="liked__board">
+      <figcaption class="liked__cap">{liked.board}</figcaption>
+      <ol class="liked__list">
+        {liked.rows.map((r, i) => (
+          <li class="liked__row">
+            <span class="liked__n" aria-hidden="true">{i + 1}</span>
+            <span class="liked__name">{r.title}<span class="liked__views">{r.views} views</span></span>
+            <span class="liked__count">{r.likes}<span class="sr-only"> likes</span></span>
+          </li>
+        ))}
+      </ol>
+      <p class="liked__versus">Popular puts <b>{liked.versus.title}</b> first, with {liked.versus.views} views. By likes it’s <span class="hl">#{liked.versus.rank}</span>.</p>
+      <p class="liked__source">{liked.source}</p>
+    </figure>
+  </section>
 
   <section class="features" data-tone="paper" aria-labelledby="features-title">
     <div class="sec-head">

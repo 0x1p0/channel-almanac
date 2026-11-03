@@ -110,6 +110,13 @@ HOME
   |                                         | lookups, uploads              |
   | full width: whole history grid, a row per year, range highlighted     |
 
+3b Most liked, asymmetric pair     ink
+  | col 1-4: kicker, title, real chip strip, note | col 6-12: NASA's top five by    |
+  |                                               | likes as a table: rank, title + |
+  |                                               | views (mono), count (marigold)  |
+  |                                               | "Popular puts The Year of Pluto |
+  |                                               | first ... By likes it's #15."   |
+
 4 Feature index, index list        paper
   | name                one line                    key |  x 9 rows
 

@@ -216,6 +216,24 @@ code.inline { font-family: var(--f-mono); font-size: 0.9em; padding: 0.05em 0.3e
 .video figcaption { margin-top: 1rem; font-size: 0.875rem; color: var(--c-muted); }
 .shots-note { margin-top: 2.5rem; font-size: 0.8125rem; color: var(--c-muted); }
 
+/* ---------- Most liked: NASA's real top five, set as a table of counts ---------- */
+.liked { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); row-gap: 3.5rem; padding: 6.5rem var(--gutter); }
+.liked__intro { grid-column: 1 / span 4; }
+.liked__title { font-family: var(--f-display); font-size: clamp(2rem, 1.25rem + 3vw, 3.75rem); font-variation-settings: 'wdth' 112, 'wght' 720; letter-spacing: -0.03em; line-height: 1; }
+.liked__text { margin-top: 1.25rem; font-size: 1.125rem; }
+.liked__chips { display: block; width: 100%; height: auto; margin-top: 2rem; border-radius: var(--radius); }
+.liked__note { margin-top: 1.5rem; color: var(--c-muted); }
+.liked .arrow-link { margin-top: 1rem; }
+.liked__board { grid-column: 6 / -1; }
+.liked__cap { padding-bottom: 0.9rem; border-bottom: 1.5px solid var(--c-fg); font-family: var(--f-mono); font-size: 0.8125rem; color: var(--c-muted); }
+.liked__row { display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; align-items: center; column-gap: clamp(0.75rem, 2vw, 1.5rem); padding-block: 1.1rem; border-bottom: 1px solid var(--c-line); }
+.liked__n { font-family: var(--f-mono); font-size: 0.875rem; color: var(--c-muted); }
+.liked__name { font-size: 1.125rem; font-weight: 500; line-height: 1.3; }
+.liked__views { display: block; margin-top: 0.3rem; font-family: var(--f-mono); font-size: 0.8125rem; font-weight: 400; color: var(--c-muted); }
+.liked__count { font-family: var(--f-display); font-size: clamp(2rem, 1.2rem + 2.6vw, 3.5rem); font-variation-settings: 'wdth' 125, 'wght' 820; letter-spacing: -0.02em; line-height: 1; color: var(--marigold); font-variant-numeric: tabular-nums; text-align: right; }
+.liked__versus { margin-top: 1.75rem; font-size: 1.125rem; }
+.liked__source { margin-top: 0.75rem; font-size: 0.8125rem; color: var(--c-muted); }
+
 /* ---------- features ---------- */
 .features { padding: 6rem var(--gutter) 6.5rem; border-top: 1px solid var(--c-line); }
 .rows { border-top: 1.5px solid var(--c-fg); }
@@ -349,6 +367,8 @@ html[data-browser='safari']:not([data-os='mobile']) .only-safari, html[data-os='
   .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .how .sec-title, .how__lede { grid-column: 1 / -1; }
   .priv__title, .priv__body { grid-column: 1 / -1; }
+  .liked__intro { grid-column: 1 / span 9; }
+  .liked__board { grid-column: 1 / -1; }
 }
 @media (max-width: 767px) {
   :root { --head-h: 3.5rem; }
@@ -363,7 +383,8 @@ html[data-browser='safari']:not([data-os='mobile']) .only-safari, html[data-os='
   .problem__points { grid-template-columns: 1fr; }
   .cards { grid-template-columns: 1fr; row-gap: 3.5rem; }
   .card__frame--chip { aspect-ratio: auto; padding: 2.5rem 1.25rem; }
-  .extra { grid-column: 1 / -1; }
+  .extra, .extra:first-child { grid-column: 1 / -1; }
+  .liked__intro { grid-column: 1 / -1; }
   .demo__head { grid-column: 1 / -1; }
   .demo__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .history { --yw: 2.4rem; --hh: calc(var(--rows, 16) * 1.05rem); }
