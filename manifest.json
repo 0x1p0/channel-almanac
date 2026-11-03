@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Channel Almanac",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Find any YouTube channel's uploads by exact date: date ranges, On this day, Shorts and live filters, play a range in order.",
   "homepage_url": "https://github.com/0x1p0/channel-almanac",
   "permissions": [

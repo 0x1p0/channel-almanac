@@ -16,7 +16,7 @@ export const site = {
   zip: 'https://github.com/0x1p0/channel-almanac/archive/refs/heads/main.zip',
   issues: 'https://github.com/0x1p0/channel-almanac/issues',
   license: 'https://github.com/0x1p0/channel-almanac/blob/main/LICENSE',
-  version: '1.0.0',
+  version: '1.1.0',
   browsers: 'Chrome, Edge, Brave, Arc and Firefox 121 or newer',
   nav: [
     { href: '/guide/', label: 'Guide' },
