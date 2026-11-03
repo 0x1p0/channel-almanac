@@ -1,0 +1,33 @@
+# Runs on every push to main and every pull request: the lib.js unit tests, a syntax check of the
+# extension's scripts, and a check that manifest.json parses. No dependencies to install.
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+
+      - name: Unit tests
+        run: node --test
+
+      - name: Extension scripts parse
+        run: |
+          node --check lib.js
+          node --check content.js
+          node --check background.js
+
+      - name: manifest.json is valid JSON
+        run: node -e "JSON.parse(require('fs').readFileSync('manifest.json', 'utf8'))"
