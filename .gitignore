@@ -21,3 +21,7 @@ site/.shots/
 site/.shots-log.txt
 site/.media/
 site/.verify/
+
+# Local Claude Code skills, worktrees and settings (not part of the extension)
+.claude/
+skills-lock.json

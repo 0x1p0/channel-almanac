@@ -2,6 +2,7 @@
 
 # Channel Almanac
 
+[![Firefox Add-ons](https://img.shields.io/amo/v/channel-almanac?label=Firefox%20Add-ons&logo=firefoxbrowser)](https://addons.mozilla.org/addon/channel-almanac/)
 [![Test](https://github.com/0x1p0/channel-almanac/actions/workflows/test.yml/badge.svg)](https://github.com/0x1p0/channel-almanac/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -11,13 +12,15 @@ Works in Chrome, Edge, Brave, Arc and other Chromium browsers (121 or newer), an
 
 **Website: [channel-almanac.vercel.app](https://channel-almanac.vercel.app)**
 
-https://github.com/user-attachments/assets/bf13457a-fc3c-4b18-bd6e-f2e65214a761
+https://github.com/user-attachments/assets/6475fe88-58b0-436d-9d39-f9d1e9f7169f
 
-The 42-second demo (with sound), recorded on NASA's public YouTube channel.
+The 48-second demo (with sound), recorded on NASA's public YouTube channel.
 
 ## Install
 
-The extension isn't in the browser stores yet, so install it from this repository.
+**Firefox:** get it on **[Firefox Add-ons](https://addons.mozilla.org/addon/channel-almanac/)**. Click **Add to Firefox**, then allow it on www.youtube.com when Firefox asks for site access. Firefox keeps it up to date.
+
+**Chrome, Edge, Brave, Arc:** it isn't in the Chrome Web Store yet, so install it from this repository.
 
 **Get the code:** clone the repo, or click **Code → Download ZIP** on GitHub and unzip it somewhere permanent (the unzipped folder is called `channel-almanac-main`).
 
@@ -25,19 +28,12 @@ The extension isn't in the browser stores yet, so install it from this repositor
 git clone https://github.com/0x1p0/channel-almanac.git
 ```
 
-**Chrome, Edge, Brave, Arc**
+**Load it:**
 1. Open `chrome://extensions` (or `edge://extensions`) and turn on **Developer mode**.
 2. Click **Load unpacked** and pick the `channel-almanac` folder.
 3. Reload any YouTube tabs that were already open.
 
-**Firefox**
-1. Open `about:debugging#/runtime/this-firefox` and click **Load Temporary Add-on…**.
-2. Pick the `manifest.json` file inside the `channel-almanac` folder.
-3. Firefox asks for site access per site: click the extensions button in the toolbar and allow it on www.youtube.com.
-
-Temporary add-ons are removed when Firefox restarts.
-
-**Updating:** pull the latest code (or download the ZIP again), then click the reload icon on the extension's card in `chrome://extensions`, or **Reload** in `about:debugging`.
+**Updating:** pull the latest code (or download the ZIP again), then click the reload icon on the extension's card in `chrome://extensions`. Firefox Add-ons updates itself.
 
 ## Open it
 
@@ -138,7 +134,7 @@ node --test
 
 GitHub Actions runs the same tests on every push and pull request, along with a syntax check of the extension's scripts and a check that `manifest.json` parses (`.github/workflows/test.yml`).
 
-After editing, reload the extension (see **Updating** above) and refresh the YouTube tab.
+After editing, reload the extension (see **Updating** above) and refresh the YouTube tab. To try changes in Firefox, open `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on…** and pick `manifest.json`; temporary add-ons are removed when Firefox restarts.
 
 To build a ZIP for the Chrome Web Store or Firefox Add-ons:
 

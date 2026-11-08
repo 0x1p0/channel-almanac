@@ -1,19 +1,18 @@
 // Every visible string on the site lives here, so it can change without touching markup.
 // Facts come from the extension's README and code. Nothing here is invented except:
-// Assumptions (placeholders the owner should confirm or replace):
-//   - url: the production domain is a placeholder until a host is chosen (placeholder: true).
-//   - The example channel used by every demo is invented and labelled as such (src/data/channel.ts).
-//   - No screenshots or screen recordings of the panel exist yet; the site shows the extension's
-//     own code running instead. A real recording would be the biggest single upgrade.
+//   - The example channel used by the live demo is invented and labelled as such (src/data/channel.ts).
+// Screenshots and the demo video are real captures of the extension on NASA's public channel
+// (public/shots, public/media). The site is hosted on Vercel at the url below.
 
 export const site = {
   name: 'Channel Almanac',
   role: 'Find any YouTube upload by its exact date',
-  url: 'https://channel-almanac.vercel.app', // placeholder: true
+  url: 'https://channel-almanac.vercel.app',
   description:
     'A free, open-source browser extension that finds anything a YouTube channel ever uploaded by its exact date, right on YouTube. No API key, no account, no server.',
   repo: 'https://github.com/0x1p0/channel-almanac',
   zip: 'https://github.com/0x1p0/channel-almanac/archive/refs/heads/main.zip',
+  amo: 'https://addons.mozilla.org/addon/channel-almanac/',
   issues: 'https://github.com/0x1p0/channel-almanac/issues',
   license: 'https://github.com/0x1p0/channel-almanac/blob/main/LICENSE',
   version: '1.1.0',

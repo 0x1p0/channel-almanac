@@ -3,8 +3,8 @@
 ## Brief
 
 - **Subject:** Channel Almanac, a free, MIT-licensed browser extension (Chromium 121+, Firefox 121+)
-  that finds anything a YouTube channel ever uploaded by its exact date. Not in the stores yet:
-  it installs from GitHub.
+  that finds anything a YouTube channel ever uploaded by its exact date. On Firefox Add-ons;
+  Chromium browsers install it from GitHub until it's in the Chrome Web Store.
 - **Audience:** people who dig through back catalogs. Fans looking for that one video,
   researchers, journalists, video essayists, archivists, creators checking their own history.
   Second audience: developers who might contribute.
@@ -18,7 +18,7 @@
   reviews. Not affiliated with YouTube.
 
 ### Assumptions (also in `src/data/site.ts`)
-- Production URL `https://channel-almanac.vercel.app` (placeholder until a host is chosen).
+- Hosted on Vercel at `https://channel-almanac.vercel.app`. On Firefox Add-ons since November 2026.
 - The example channel (1,284 uploads since 2011) is generated from a fixed seed relative to the
   build date, so "3 years ago" stays true whenever the site is rebuilt.
 

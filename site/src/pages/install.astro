@@ -6,19 +6,29 @@ import ExtPage from '../components/ExtPage.astro';
 const clone = `git clone ${site.repo}.git`;
 const zipCmd = 'zip -r channel-almanac.zip manifest.json background.js content.js lib.js icons LICENSE';
 ---
-<Base title="Install" description="Install Channel Almanac from GitHub in about a minute: Chrome, Edge, Brave, Arc and Firefox 121 or newer. Free, open source, no account.">
+<Base title="Install" description="Get Channel Almanac on Firefox Add-ons, or install it from GitHub in Chrome, Edge, Brave and Arc. Free, open source, no account.">
   <header class="page-head" data-tone="paper">
     <h1 class="page-head__title">Install</h1>
-    <p class="page-head__lede">It isn’t in the browser stores yet, so it installs from GitHub. About a minute, no account, in any Chromium browser or Firefox.</p>
+    <p class="page-head__lede">In Firefox it’s one click on Firefox Add-ons. In Chrome, Edge, Brave and Arc it installs from GitHub for now, in about a minute. No account either way.</p>
   </header>
   <div class="page-body" data-tone="paper">
     <p class="note only-safari">Channel Almanac runs in Chrome, Edge, Brave, Arc and Firefox. Safari isn’t supported, so open this page in one of those.</p>
     <p class="note only-mobile">Channel Almanac is a desktop browser extension. Open this page on your computer to install it.</p>
+
+    <div class="split" id="firefox">
+      <h2 class="split__h">Firefox</h2>
+      <div class="split__b">
+        <p>Click <b>Add to Firefox</b> on its Firefox Add-ons page. When Firefox asks for site access, allow it on www.youtube.com. Firefox keeps it up to date.</p>
+        <p><a class="btn btn--solid" href={site.amo}>Get it on Firefox Add-ons</a></p>
+      </div>
+    </div>
+
+    <h2 class="install__h" id="chromium">Chrome, Edge, Brave, Arc</h2>
     <ol class="steps">
       <li class="step">
         <p class="step__n" aria-hidden="true">1</p>
         <div class="step__body">
-          <h2 class="step__title">Get the code</h2>
+          <h3 class="step__title">Get the code</h3>
           <p>Download the ZIP and unzip it somewhere permanent (the folder is called <code class="inline">channel-almanac-main</code>), or clone the repository.</p>
           <p><a class="btn btn--solid" href={site.zip}>Download ZIP</a></p>
           <div class="code"><code id="cmd-clone">{clone}</code><button type="button" data-copy="cmd-clone" hidden>Copy</button></div>
@@ -27,35 +37,19 @@ const zipCmd = 'zip -r channel-almanac.zip manifest.json background.js content.j
       <li class="step">
         <p class="step__n" aria-hidden="true">2</p>
         <div class="step__body">
-          <h2 class="step__title">Load it in your browser</h2>
-          <div class="tablist" role="tablist" aria-label="Browser">
-            <button type="button" role="tab" id="tab-chromium" aria-controls="panel-chromium" aria-selected="true">Chrome, Edge, Brave, Arc</button>
-            <button type="button" role="tab" id="tab-firefox" aria-controls="panel-firefox" aria-selected="false" tabindex="-1">Firefox</button>
-          </div>
-          <div class="panel" id="panel-chromium" role="tabpanel" aria-labelledby="tab-chromium">
-            <h3 class="sr-only">Chrome, Edge, Brave, Arc</h3>
-            <ol>
-              <li>Open <ExtPage /> and turn on <b>Developer mode</b>.</li>
-              <li>Click <b>Load unpacked</b> and pick the folder you unzipped.</li>
-              <li>Reload any YouTube tabs that were already open.</li>
-            </ol>
-          </div>
-          <div class="panel" id="panel-firefox" role="tabpanel" aria-labelledby="tab-firefox" hidden>
-            <h3 class="sr-only">Firefox</h3>
-            <ol>
-              <li>Open <code class="inline">about:debugging#/runtime/this-firefox</code> and click <b>Load Temporary Add-on…</b></li>
-              <li>Pick the <code class="inline">manifest.json</code> file inside the folder.</li>
-              <li>Firefox asks for site access per site: click the extensions button in the toolbar and allow it on www.youtube.com.</li>
-            </ol>
-            <p class="note">Temporary add-ons are removed when Firefox restarts.</p>
-          </div>
+          <h3 class="step__title">Load it in your browser</h3>
+          <ol>
+            <li>Open <ExtPage /> and turn on <b>Developer mode</b>.</li>
+            <li>Click <b>Load unpacked</b> and pick the folder you unzipped.</li>
+            <li>Reload any YouTube tabs that were already open.</li>
+          </ol>
         </div>
       </li>
       <li class="step">
         <p class="step__n" aria-hidden="true">3</p>
         <div class="step__body">
-          <h2 class="step__title">Open any channel</h2>
-          <p>On a channel’s Videos tab, click <b>Dates</b> next to Latest, Popular and Oldest. Anywhere on YouTube, press <Shortcut />. The <a class="arrow-link" href="/guide/#open">guide <span aria-hidden="true">→</span></a> lists every way in.</p>
+          <h3 class="step__title">Open any channel</h3>
+          <p>On a channel’s Videos tab, click <b>Dates</b> or <b>Most liked</b> next to Latest, Popular and Oldest. Anywhere on YouTube, press <Shortcut />. The <a class="arrow-link" href="/guide/#open">guide <span aria-hidden="true">→</span></a> lists every way in.</p>
           <p class="muted-note">Want different keys? Open <ExtPage shortcuts /><span class="only-firefox">, then the gear menu, Manage Extension Shortcuts</span>.</p>
         </div>
       </li>
@@ -64,7 +58,7 @@ const zipCmd = 'zip -r channel-almanac.zip manifest.json background.js content.j
     <div class="split" style="margin-top: 5rem">
       <h2 class="split__h">Updating</h2>
       <div class="split__b">
-        <p>Pull the latest code (or download the ZIP again), then click the reload icon on the extension’s card in <code class="inline">chrome://extensions</code>, or <b>Reload</b> in <code class="inline">about:debugging</code>.</p>
+        <p>Firefox Add-ons updates itself. In Chrome, Edge, Brave and Arc, pull the latest code (or download the ZIP again), then click the reload icon on the extension’s card in <code class="inline">chrome://extensions</code>.</p>
       </div>
     </div>
     <div class="split">
@@ -72,6 +66,7 @@ const zipCmd = 'zip -r channel-almanac.zip manifest.json background.js content.j
       <div class="split__b">
         <p>There is no build step: the files in the folder are the extension. Run the tests with Node 18 or newer, no dependencies to install:</p>
         <div class="code"><code id="cmd-test">node --test</code><button type="button" data-copy="cmd-test" hidden>Copy</button></div>
+        <p>To try your changes in Firefox, open <code class="inline">about:debugging#/runtime/this-firefox</code>, click <b>Load Temporary Add-on…</b> and pick <code class="inline">manifest.json</code>. Temporary add-ons are removed when Firefox restarts.</p>
         <p>To build a ZIP for the Chrome Web Store or Firefox Add-ons:</p>
         <div class="code"><code id="cmd-zip">{zipCmd}</code><button type="button" data-copy="cmd-zip" hidden>Copy</button></div>
         <p>Bug reports and pull requests are welcome on <a class="arrow-link" href={site.issues}>GitHub <span aria-hidden="true">→</span></a></p>

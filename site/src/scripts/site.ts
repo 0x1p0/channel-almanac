@@ -148,7 +148,6 @@ function demo(root: HTMLElement) {
   }
 }
 
-// Install page: Chromium / Firefox tabs (both panels show without JS).
 const browser = document.documentElement.dataset.browser ?? 'other';
 
 // The visitor's own extensions page; chrome:// stays for Chrome, Arc and anything unknown.
@@ -157,31 +156,6 @@ function extPages() {
   document.querySelectorAll<HTMLElement>('[data-ext-page]').forEach((el) => {
     el.textContent = browser === 'firefox' ? 'about:addons' : `${scheme}://extensions${el.dataset.extPage === 'shortcuts' ? '/shortcuts' : ''}`;
   });
-}
-
-function tabs(list: HTMLElement) {
-  const all = [...list.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
-  const pick = (t: HTMLButtonElement, focus = false) => {
-    all.forEach((x) => {
-      const on = x === t;
-      x.setAttribute('aria-selected', String(on));
-      x.tabIndex = on ? 0 : -1;
-      document.getElementById(x.getAttribute('aria-controls')!)!.hidden = !on;
-    });
-    if (focus) t.focus();
-  };
-  list.addEventListener('click', (e) => { const t = (e.target as HTMLElement).closest<HTMLButtonElement>('[role="tab"]'); if (t) pick(t); });
-  list.addEventListener('keydown', (e) => {
-    const i = all.indexOf(document.activeElement as HTMLButtonElement);
-    if (i < 0) return;
-    const j = e.key === 'ArrowRight' ? (i + 1) % all.length : e.key === 'ArrowLeft' ? (i - 1 + all.length) % all.length : e.key === 'Home' ? 0 : e.key === 'End' ? all.length - 1 : -1;
-    if (j < 0) return;
-    e.preventDefault();
-    pick(all[j], true);
-  });
-  list.classList.add('is-live');
-  // Firefox visitors land on the Firefox steps.
-  pick(all.find((t) => browser === 'firefox' && t.id === 'tab-firefox') ?? all.find((t) => t.getAttribute('aria-selected') === 'true') ?? all[0]);
 }
 
 function copy(b: HTMLButtonElement) {
@@ -201,5 +175,4 @@ function copy(b: HTMLButtonElement) {
 extPages();
 const demoRoot = document.querySelector<HTMLElement>('[data-demo]');
 if (demoRoot) demo(demoRoot);
-document.querySelectorAll<HTMLElement>('[role="tablist"]').forEach(tabs);
 document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach(copy);
